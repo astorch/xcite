@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+    <Authors>Arian Storch</Authors>
+    <Company>Arian Storch</Company>
+    <Product>xcite messaging</Product>
+    <Description>Provides messaging functions between object instances of a system.</Description>
+    <Copyright>Copyright © 2017</Copyright>
+    <PackageLicenseUrl>https://github.com/astorch/xcite</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/astorch/xcite</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <PackageTags>C# .NET xcite messaging</PackageTags>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard1.4\xcite.messaging.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.4\xcite.messaging.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\xcite.collections\xcite.collections.csproj" />
+    <ProjectReference Include="..\xcite.csharp\xcite.csharp.csproj" />
+  </ItemGroup>
+
+</Project>
