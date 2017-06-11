@@ -12,11 +12,11 @@ namespace xcite.csharp {
         /// <param name="type">Type which public properties to look up</param>
         /// <returns>All public properties of the given type</returns>
         public static PropertyInfo[] GetPublicProperties(this Type type) {
-            if (!type.GetTypeInfo().IsInterface) return type.GetPublicProperties();
+            if (!type.GetTypeInfo().IsInterface) return type.GetTypeInfo().DeclaredProperties.ToArray();
 
             return new[] {type}
                 .Concat(type.GetTypeInfo().ImplementedInterfaces)
-                .SelectMany(i => i.GetPublicProperties()).ToArray();
+                .SelectMany(i => i.GetTypeInfo().DeclaredProperties).ToArray();
         }
     }
 }

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.4</TargetFramework>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Product>xcite collections</Product>
