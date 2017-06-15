@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;netstandard1.4</TargetFrameworks>
-    <Version>3.0.3</Version>
+    <Version>3.0.4</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Description>Provides various c# programming extensions for .NET.</Description>
@@ -16,6 +16,8 @@
     <RepositoryType>GIT</RepositoryType>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
