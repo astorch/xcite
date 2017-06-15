@@ -9,30 +9,46 @@ namespace xcite.messaging {
     /// <param name="message">Error message</param>
     public delegate void MessageDispatchErrorHandler(string message);
 
+    /// <summary> Defines the signature of an UI thread dispatcher. </summary>
+    /// <param name="action">Action to invoke on the UI thread</param>
+    public delegate void UIThreadDispatcher(Action action);
+
     /// <summary> Provides a common message dispatcher. </summary>
     public class MessageDispatcher : GenericSingleton<MessageDispatcher> {
         private readonly AutoLockStruct<bool> _isAlive = new AutoLockStruct<bool>();
 
-        private readonly AutoLockObject<LinearList<ConsumerEntry>> _registeredConsumers =
-            new AutoLockObject<LinearList<ConsumerEntry>>(new LinearList<ConsumerEntry>());
-
-        private readonly AutoLockObject<LinearList<EnqueuedEvent>> _eventQueue =
-            new AutoLockObject<LinearList<EnqueuedEvent>>(new LinearList<EnqueuedEvent>());
-
+        private readonly AutoLockObject<LinearList<ConsumerEntry>> _registeredConsumers = new AutoLockObject<LinearList<ConsumerEntry>>(new LinearList<ConsumerEntry>());
+        private readonly AutoLockObject<LinearList<EnqueuedEvent>> _eventQueue = new AutoLockObject<LinearList<EnqueuedEvent>>(new LinearList<EnqueuedEvent>());
         private readonly ManualResetEventSlim _processQueueEvent = new ManualResetEventSlim(false);
+        private UIThreadDispatcher _uiThreadDispatcher;
 
         /// <summary> Event that is raised when a dispatch error occurred. </summary>
         public event MessageDispatchErrorHandler Error;
+
+        /// <summary> Returns the UI Thread dispatcher or does set it. </summary>
+        public UIThreadDispatcher UIThreadDispatcher {
+            get {
+                lock (this) {
+                    return _uiThreadDispatcher;
+                }
+            }
+            set {
+                lock (this) {
+                    _uiThreadDispatcher = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Subscribes the given <paramref name="messageConsumer"/> to the dispatcher.
         /// </summary>
         /// <param name="messageConsumer">Message consumer</param>
         /// <param name="dataObject">Additional data object that is passed to the consumer each time</param>
-        public void Subscribe(IMessageConsumer messageConsumer, object dataObject = null) {
+        /// <param name="uiThreadDispatch">Requires UI thread dispatching</param>
+        public void Subscribe(IMessageConsumer messageConsumer, object dataObject = null, bool uiThreadDispatch = false) {
             if (messageConsumer == null) return;
 
-            _registeredConsumers.Access(_ => _.Add(new ConsumerEntry(messageConsumer, dataObject)));
+            _registeredConsumers.Access(_ => _.Add(new ConsumerEntry(messageConsumer, dataObject, uiThreadDispatch)));
         }
 
         /// <summary>
@@ -82,6 +98,9 @@ namespace xcite.messaging {
                 });
                 ConsumerEntry[] registeredConsumers = messageDispatcher._registeredConsumers.Access(_ => _.ToArray());
 
+                // Get the set UI thread dispatcher or set a fake one
+                UIThreadDispatcher uiThreadDispatcher = UIThreadDispatcher ?? (_ =>_());
+
                 // Dispatch
                 for (int i = -1; ++i != queuedEvents.Length;) {
                     EnqueuedEvent queuedEvent = queuedEvents[i];
@@ -89,11 +108,25 @@ namespace xcite.messaging {
                     for (int j = -1; ++j != registeredConsumers.Length;) {
                         ConsumerEntry consumerEntry = registeredConsumers[j];
 
+                        // Anonymous function to dispatch the event
+                        void dispatchEvent() {
+                            try {
+                                consumerEntry.MessageConsumer.OnMessageReceived(queuedEvent.Sender,
+                                    queuedEvent.EventArguments, consumerEntry.DataObject);
+                            } catch (Exception ex) {
+                                string errorMessage = $"Error on dispatching event to '{consumerEntry.MessageConsumer.GetType()}'. Reason: {ex}";
+                                Error?.Invoke(errorMessage);
+                            }
+                        }
+
+                        // Dispatch event using the configured thread
                         try {
-                            consumerEntry.MessageConsumer.OnMessageReceived(queuedEvent.Sender,
-                                queuedEvent.EventArguments, consumerEntry.DataObject);
+                            if (consumerEntry.UIThreadDispatch)
+                                uiThreadDispatcher(dispatchEvent);
+                            else 
+                                dispatchEvent();
                         } catch (Exception ex) {
-                            string errorMessage = $"Error on dispatch event to '{consumerEntry.MessageConsumer.GetType()}'. Reason: {ex}";
+                            string errorMessage = $"Error on invoking event dispatch to '{consumerEntry.MessageConsumer.GetType()}'. Reason: {ex}";
                             Error?.Invoke(errorMessage);
                         }
                     }
@@ -139,9 +172,11 @@ namespace xcite.messaging {
             /// </summary>
             /// <param name="messageConsumer">Message consumer</param>
             /// <param name="dataObject">Additional data object</param>
-            public ConsumerEntry(IMessageConsumer messageConsumer, object dataObject) {
+            /// <param name="uiThreadDispatch">Requires UI thread dispatching</param>
+            public ConsumerEntry(IMessageConsumer messageConsumer, object dataObject, bool uiThreadDispatch) {
                 MessageConsumer = messageConsumer;
                 DataObject = dataObject;
+                UIThreadDispatch = uiThreadDispatch;
             }
 
             /// <summary> Returns the message consumer. </summary>
@@ -149,6 +184,9 @@ namespace xcite.messaging {
 
             /// <summary> Returns the additional data object. </summary>
             public object DataObject { get; }
+
+            /// <summary> Returns TRUE if the event shall be dispatched by the UI thread. </summary>
+            public bool UIThreadDispatch { get; }
         }
     }
 }

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;netstandard1.4</TargetFrameworks>
-	<Version>1.0.3</Version>    
+	<Version>1.0.4</Version>    
 	<Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Product>xcite messaging</Product>
@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>C# .NET xcite messaging</PackageTags>
-    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <PackageReleaseNotes>Introduced UI thread relay flag</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
