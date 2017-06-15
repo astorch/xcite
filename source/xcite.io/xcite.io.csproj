@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.4</TargetFramework>
-    <Authors>Arian Storch</Authors>
+    <TargetFrameworks>net462;netstandard1.4</TargetFrameworks>
+	<Version>1.0.2</Version>    
+	<Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Product>xcite io</Product>
     <Description>Provides various c# programming extensions for IO operations.</Description>
@@ -15,7 +16,6 @@
     <PackageReleaseNotes>Initial release</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
