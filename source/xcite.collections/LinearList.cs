@@ -9,16 +9,12 @@ namespace xcite.collections {
     /// </summary>
     /// <typeparam name="TItem">Data type of managed items</typeparam>
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-    public class LinearList<TItem> : ICollection<TItem> {
-        // ReSharper disable once InconsistentNaming
-        private LinearListItem Head;
+    public class LinearList<TItem> : ICollection<TItem>, ISortable<TItem> {
+        
+        private LinearListItem _head;
+        private LinearListItem _tail;
 
-        // ReSharper disable once InconsistentNaming
-        private LinearListItem Tail;
-
-        /// <summary>
-        /// Creates a new instance.
-        /// </summary>
+        /// <summary>  Creates a new instance. </summary>
         public LinearList() {
             // Nothing to do here
         }
@@ -32,35 +28,30 @@ namespace xcite.collections {
             enumerable.ForEach(Add);
         }
 
-        /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
-        /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-        /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
+        /// <inheritdoc />
         public virtual void Add(TItem item) {
             if (item == null) return;
 
-            if (Head == null) {
-                Head = new LinearListItem(item);
-                Tail = Head;
+            if (_head == null) {
+                _head = new LinearListItem(item);
+                _tail = _head;
             } else {
-                LinearListItem oldTail = Tail;
-                Tail = new LinearListItem(item);
-                oldTail.Next = Tail;
+                LinearListItem oldTail = _tail;
+                _tail = new LinearListItem(item);
+                oldTail.Next = _tail;
             }
 
             Count++;
         }
 
-        /// <summary>Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
-        /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only. </exception>
+        /// <inheritdoc />
         public virtual void Clear() {
-            Head = null;
-            Tail = null;
+            _head = null;
+            _tail = null;
             Count = 0;
         }
 
-        /// <summary>Determines whether the <see cref="T:System.Collections.Generic.ICollection`1" /> contains a specific value.</summary>
-        /// <returns>true if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false.</returns>
-        /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
+        /// <inheritdoc />
         public virtual bool Contains(TItem item) {
             if (item == null) return false;
 
@@ -74,14 +65,7 @@ namespace xcite.collections {
             return false;
         }
 
-        /// <summary>Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.</summary>
-        /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
-        /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// <paramref name="array" /> is null.</exception>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// <paramref name="arrayIndex" /> is less than 0.</exception>
-        /// <exception cref="T:System.ArgumentException">The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1" /> is greater than the available space from <paramref name="arrayIndex" /> to the end of the destination <paramref name="array" />.</exception>
+        /// <inheritdoc />
         public virtual void CopyTo(TItem[] array, int arrayIndex) {
             TItem[] listItems = ToArray();
             if (listItems.Length + arrayIndex > array.Length)
@@ -89,31 +73,27 @@ namespace xcite.collections {
             Array.Copy(listItems, 0, array, arrayIndex, listItems.Length);
         }
 
-        /// <summary>Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
-        /// <returns>The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.</returns>
+        /// <inheritdoc />
         public virtual int Count { get; private set; }
 
-        /// <summary>Returns an enumerator that iterates through a collection.</summary>
-        /// <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        /// <inheritdoc />
+        IEnumerator IEnumerable.GetEnumerator() 
+            => GetEnumerator();
 
-        /// <summary>Returns an enumerator that iterates through the collection.</summary>
-        /// <returns>A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.</returns>
-        public virtual IEnumerator<TItem> GetEnumerator() => new LinearListEnumerator(this);
+        /// <inheritdoc />
+        public virtual IEnumerator<TItem> GetEnumerator() 
+            => new LinearListEnumerator(this);
 
-        /// <summary>Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</summary>
-        /// <returns>true if the <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only; otherwise, false.</returns>
-        public virtual bool IsReadOnly => false;
+        /// <inheritdoc />
+        public virtual bool IsReadOnly
+            => false;
 
-        /// <summary>Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
-        /// <returns>true if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false. This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.</returns>
-        /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-        /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
+        /// <inheritdoc />
         public virtual bool Remove(TItem item) {
             if (item == null) return false;
 
             LinearListItem precedingItem = null;
-            LinearListItem current = Head;
+            LinearListItem current = _head;
 
             while (current != null) {
                 TItem currentItem = current.Item;
@@ -125,13 +105,13 @@ namespace xcite.collections {
                 }
 
                 // We matched the head
-                if (current == Head) {
-                    Head = current.Next;
+                if (current == _head) {
+                    _head = current.Next;
                 }
 
                 // We matched the tail
-                if (current == Tail) {
-                    Tail = precedingItem;
+                if (current == _tail) {
+                    _tail = precedingItem;
                 }
 
                 // We matched any item in sequence
@@ -164,34 +144,115 @@ namespace xcite.collections {
             return array;
         }
 
-        /// <summary>Returns a string that represents the current object.</summary>
-        /// <returns>A string that represents the current object.</returns>
+        /// <inheritdoc />
         public override string ToString() {
-            string result = string.Format("Count = {0}", Count);
+            string result = $"Count = {Count}";
             return result;
         }
 
+        #region ISortable
+
+        /// <inheritdoc />
+        void ISortable.Sort(Comparison<object> comparison) {
+            SortInternal((e1, e2) => comparison(e1, e2));
+        }
+
+        /// <inheritdoc />
+        void ISortable.Sort(IComparer comparer) {
+            SortInternal((e1, e2) => comparer.Compare(e1, e2));
+        }
+
+        /// <inheritdoc />
+        void ISortable.Sort<TProperty>(Func<object, TProperty> propertyReference) {
+            SortInternal((e1, e2) => {
+                TProperty v1 = propertyReference(e1);
+                TProperty v2 = propertyReference(e2);
+                return Comparer<TProperty>.Default.Compare(v1, v2);
+            });
+        }
+
+        /// <inheritdoc />
+        public void Sort(Comparison<TItem> comparison) {
+            SortInternal(comparison);
+        }
+
+        /// <inheritdoc />
+        public void Sort(Comparer<TItem> comparer) {
+            SortInternal(comparer.Compare);
+        }
+
+        /// <inheritdoc />
+        public void Sort<TProperty>(Func<TItem, TProperty> propertyReference) {
+            SortInternal((e1, e2) => {
+                TProperty v1 = propertyReference(e1);
+                TProperty v2 = propertyReference(e2);
+                return Comparer<TProperty>.Default.Compare(v1, v2);
+            });
+        }
+
         /// <summary>
-        /// Implements a linear list item.
+        /// Sorts the item of the collection using the given <paramref name="comparison"/> 
+        /// in ascending order. 
         /// </summary>
+        /// <param name="comparison">Comparison</param>
+        private void SortInternal(Comparison<TItem> comparison) {
+            // Note, the sort may be faster, if we use a 'sort by insert' (binary) approach
+
+            LinearListItem currentRef = _head;
+
+            // Iterate until the end
+            while (currentRef != null) {
+                // Current sublist head
+                LinearListItem subListHead = currentRef;
+
+                // Reference to current sublist minimum item
+                LinearListItem minSublistItem = subListHead;
+                TItem minItem = minSublistItem.Item;
+
+                // Sublist iterator
+                LinearListItem sublistCursor = subListHead;
+                while (sublistCursor != null) {
+                    TItem sublistCursorItem = sublistCursor.Item;
+
+                    // If the current sublist cursor item is lower, we have a new minimum item
+                    bool isLower = comparison(sublistCursorItem, minItem) == -1;
+                    if (isLower) {
+                        minSublistItem = sublistCursor;
+                        minItem = sublistCursorItem;
+                    }
+
+                    // Move on
+                    sublistCursor = sublistCursor.Next;
+                }
+
+                // Now we have the lowest item, so we can swap it
+                if (minSublistItem != subListHead) { // Swap only if we have a real change
+                    TItem buffer = subListHead.Item;
+                    subListHead.Item = minSublistItem.Item;
+                    minSublistItem.Item = buffer;
+                }
+
+                // Move on
+                currentRef = currentRef.Next;
+            }
+        }
+
+        #endregion
+
+        /// <summary> Implements a linear list item. </summary>
         class LinearListItem {
             /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
             public LinearListItem(TItem item) {
                 Item = item;
             }
 
-            /// <summary>
-            /// Returns the stored item or does set it.
-            /// </summary>
-            public readonly TItem Item;
+            /// <summary> Stored item </summary>
+            public TItem Item; // TODO Check readonly removement
 
-            /// <summary>
-            /// Returns the next list item. May be NULL.
-            /// </summary>
+            /// <summary> Next list item. May be NULL. </summary>
             public LinearListItem Next;
 
-            /// <summary>Returns a string that represents the current object.</summary>
-            /// <returns>A string that represents the current object.</returns>
+            /// <inheritdoc />
             public override string ToString() {
                 if (Item == null) return string.Empty;
                 return Item.ToString();
@@ -210,34 +271,32 @@ namespace xcite.collections {
                 iLinearList = linearList;
 
                 // Must not be NULL
-                iCurrent = new LinearListItem(default(TItem)) {Next = linearList.Head};
+                iCurrent = new LinearListItem(default(TItem)) {Next = linearList._head};
             }
 
-            /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+            /// <inheritdoc />
             public void Dispose() {
                 // Currently nothing to do here
             }
 
-            /// <summary>Advances the enumerator to the next element of the collection.</summary>
-            /// <returns>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the collection.</returns>
-            /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception>
+            /// <inheritdoc />
             public bool MoveNext() {
                 if (iCurrent.Next == null) return false;
                 iCurrent = iCurrent.Next;
                 return true;
             }
 
-            /// <summary>Sets the enumerator to its initial position, which is before the first element in the collection.</summary>
-            /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception>
-            public void Reset() => iCurrent = iLinearList.Head;
+            /// <inheritdoc />
+            public void Reset() 
+                => iCurrent = iLinearList._head;
 
-            /// <summary>Gets the element in the collection at the current position of the enumerator.</summary>
-            /// <returns>The element in the collection at the current position of the enumerator.</returns>
-            public TItem Current => iCurrent.Item;
+            /// <inheritdoc />
+            public TItem Current 
+                => iCurrent.Item;
 
-            /// <summary>Gets the current element in the collection.</summary>
-            /// <returns>The current element in the collection.</returns>
-            object IEnumerator.Current => Current;
+            /// <inheritdoc />
+            object IEnumerator.Current 
+                => Current;
         }
     }
 }
