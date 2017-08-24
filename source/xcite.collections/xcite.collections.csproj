@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;netstandard1.4</TargetFrameworks>
-    <Version>3.0.3</Version>
+    <TargetFrameworks>netstandard1.6</TargetFrameworks>
+    <Version>4.0.0</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Product>xcite collections</Product>
@@ -13,7 +13,10 @@
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>C# .NET xcite collections</PackageTags>
-    <PackageReleaseNotes>Migrated to .NET Standard 1.4</PackageReleaseNotes>
+    <PackageReleaseNotes>- Migrated to .NET Standard 1.6
+- Added support of .NET Core 1.0
+- Added various dispose calls to enumerators
+- Introduced ISortable&lt;T&gt;</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
@@ -21,11 +24,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard1.4\xcite.collections.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netstandard1.6\xcite.collections.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard1.4\xcite.collections.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netstandard1.6\xcite.collections.xml</DocumentationFile>
   </PropertyGroup>
 
 </Project>
