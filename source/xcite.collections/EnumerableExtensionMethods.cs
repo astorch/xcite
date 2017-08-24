@@ -54,9 +54,16 @@ namespace xcite.collections {
         /// <param name="sequence">Collection of items</param>
         /// <param name="action">Action to apply to each element</param>
         public static void ForEach(this IEnumerable sequence, Action<object> action) {
-            for (IEnumerator itr = sequence.GetEnumerator(); itr.MoveNext();) {
-                object item = itr.Current;
-                action(item);
+            if (sequence == null) throw new NullReferenceException();
+            IEnumerator itr = sequence.GetEnumerator();
+
+            try {
+                while (itr.MoveNext()) {
+                    object item = itr.Current;
+                    action(item);
+                }
+            } finally {
+                (itr as IDisposable)?.Dispose();
             }
         }
 
