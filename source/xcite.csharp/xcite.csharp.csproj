@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;netstandard1.4</TargetFrameworks>
-    <Version>3.0.4</Version>
+    <TargetFrameworks>netstandard1.6</TargetFrameworks>
+    <Version>4.0.0</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Description>Provides various c# programming extensions for .NET.</Description>
     <Copyright>Copyright © 2017</Copyright>
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
-    <PackageTags>C# .NET xcite csharop</PackageTags>
+    <PackageTags>C# .NET xcite csharp</PackageTags>
     <PackageLicenseUrl>https://github.com/astorch/xcite</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/astorch/xcite</PackageProjectUrl>
-    <PackageReleaseNotes>Migrated to .NET Standard 1.4</PackageReleaseNotes>
+    <PackageReleaseNotes>Migrated to .NET Standard 1.6</PackageReleaseNotes>
     <Product>xcite csharp</Product>
     <RepositoryType>GIT</RepositoryType>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
