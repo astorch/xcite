@@ -215,7 +215,7 @@ namespace xcite.collections {
                     TItem sublistCursorItem = sublistCursor.Item;
 
                     // If the current sublist cursor item is lower, we have a new minimum item
-                    bool isLower = comparison(sublistCursorItem, minItem) == -1;
+                    bool isLower = comparison(sublistCursorItem, minItem) < 0;
                     if (isLower) {
                         minSublistItem = sublistCursor;
                         minItem = sublistCursorItem;
