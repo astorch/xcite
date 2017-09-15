@@ -137,7 +137,7 @@ namespace xcite.messaging {
         /// <inheritdoc />
         protected override void OnInitialize() {
             _isAlive.Set(true);
-            Thread thread = new Thread(ReadAndDispatch) {Name = "Motoi Message Dispatcher", IsBackground = true};
+            Thread thread = new Thread(ReadAndDispatch) {Name = "xcite msg dispatcher", IsBackground = true};
             thread.Start(this);
         }
 
