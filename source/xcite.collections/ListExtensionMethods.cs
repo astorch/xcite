@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace xcite.collections {
-    /// <summary>
-    /// Provides common extensions for collections.
-    /// </summary>
-    public static class ListExtensions {
+    /// <summary> Provides common extensions for collections. </summary>
+    public static class ListExtensionMethods {
         /// <summary>
         /// Adds the given enumerable collection of items to current list.
         /// </summary>
@@ -14,9 +12,9 @@ namespace xcite.collections {
         /// <param name="list">List which will receive the new items</param>
         /// <param name="additionalItems">Items that will be added to the current list</param>
         public static void AddAll<TItem>(this IList<TItem> list, IEnumerable<TItem> additionalItems) {
-            using (IEnumerator<TItem> enmtor = additionalItems.GetEnumerator()) {
-                while (enmtor.MoveNext()) {
-                    TItem item = enmtor.Current;
+            using (IEnumerator<TItem> itr = additionalItems.GetEnumerator()) {
+                while (itr.MoveNext()) {
+                    TItem item = itr.Current;
                     list.Add(item);
                 }
             }
@@ -65,10 +63,8 @@ namespace xcite.collections {
         /// </summary>
         private const string DictionaryToStringFormat = "{0}='{1}'; ";
 
-        /// <summary>
-        /// Reusable string builder
-        /// </summary>
-        private static readonly StringBuilder iStringBuilder = new StringBuilder();
+        /// <summary>  Reusable string builder </summary>
+        private static readonly StringBuilder StringBuilder = new StringBuilder();
 
         /// <summary>
         /// Returns a formatted string representation of a dictionary.
@@ -78,16 +74,16 @@ namespace xcite.collections {
         /// <param name="map"></param>
         /// <returns>String representation of the dictionary</returns>
         public static string ToFormattedString<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> map) {
-            iStringBuilder.Clear();
-            iStringBuilder.Append('{');
-            using (IEnumerator<KeyValuePair<TKey, TValue>> enmtor = map.GetEnumerator()) {
-                while (enmtor.MoveNext()) {
-                    KeyValuePair<TKey, TValue> pair = enmtor.Current;
-                    iStringBuilder.AppendFormat(DictionaryToStringFormat, pair.Key, pair.Value);
+            StringBuilder.Clear();
+            StringBuilder.Append('{');
+            using (IEnumerator<KeyValuePair<TKey, TValue>> itr = map.GetEnumerator()) {
+                while (itr.MoveNext()) {
+                    KeyValuePair<TKey, TValue> pair = itr.Current;
+                    StringBuilder.AppendFormat(DictionaryToStringFormat, pair.Key, pair.Value);
                 }
             }
-            iStringBuilder.Append('}');
-            return iStringBuilder.ToString();
+            StringBuilder.Append('}');
+            return StringBuilder.ToString();
         }
     }
 }

@@ -3,9 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace xcite.collections {
-    /// <summary>
-    /// Provides method extension for <see cref="IEnumerable{T}"/>.
-    /// </summary>
+    /// <summary> Provides method extension for <see cref="IEnumerable{T}"/>. </summary>
     public static class EnumerableExtensionMethods {
         /// <summary>
         /// Applies the given <paramref name="action"/> to each element of the given sequence <paramref name="sequence"/>.
@@ -30,12 +28,10 @@ namespace xcite.collections {
         /// <returns>Array of all sequence items</returns>
         public static TItem[] ToArray<TItem>(this IEnumerable<TItem> sequence) {
             // Check if it's already an array
-            TItem[] itemArray = sequence as TItem[];
-            if (itemArray != null) return itemArray;
+            if (sequence is TItem[] itemArray) return itemArray;
 
             // Check if we need just to perform a copy
-            ICollection<TItem> itemCollection = sequence as ICollection<TItem>;
-            if (itemCollection != null) {
+            if (sequence is ICollection<TItem> itemCollection) {
                 itemArray = new TItem[itemCollection.Count];
                 itemCollection.CopyTo(itemArray, 0);
                 return itemArray;
@@ -85,9 +81,16 @@ namespace xcite.collections {
         /// <param name="selector">Transform function</param>
         /// <returns>Collection of transformed items</returns>
         public static IEnumerable<TResult> Select<TResult>(this IEnumerable sequence, Func<object, TResult> selector) {
-            for (IEnumerator itr = sequence.GetEnumerator(); itr.MoveNext();) {
-                object element = itr.Current;
-                yield return selector(element);
+            if (sequence == null) throw new NullReferenceException();
+            IEnumerator itr = sequence.GetEnumerator();
+
+            try {
+                while (itr.MoveNext()) {
+                    object element = itr.Current;
+                    yield return selector(element);
+                }
+            } finally {
+                (itr as IDisposable)?.Dispose();
             }
         }
 
@@ -111,12 +114,10 @@ namespace xcite.collections {
         /// <returns>Array of all sequence items</returns>
         public static object[] ToArray(this IEnumerable sequence) {
             // Check if it's already an array
-            object[] objectArray = sequence as object[];
-            if (objectArray != null) return objectArray;
+            if (sequence is object[] objectArray) return objectArray;
 
             // Check if we need just to perform a copy
-            ICollection objectCollection = sequence as ICollection;
-            if (objectCollection != null) {
+            if (sequence is ICollection objectCollection) {
                 objectArray = new object[objectCollection.Count];
                 objectCollection.CopyTo(objectArray, 0);
                 return objectArray;
@@ -137,10 +138,18 @@ namespace xcite.collections {
         /// <param name="predicate">Predicate to identify the desired item</param>
         /// <returns></returns>
         public static object FirstOrDefault(this IEnumerable sequence, Predicate<object> predicate) {
-            for (IEnumerator itr = sequence.GetEnumerator(); itr.MoveNext();) {
-                object current = itr.Current;
-                if (predicate(current)) return current;
+            if (sequence == null) throw new NullReferenceException();
+            IEnumerator itr = sequence.GetEnumerator();
+
+            try {
+                while (itr.MoveNext()) {
+                    object current = itr.Current;
+                    if (predicate(current)) return current;
+                }
+            } finally {
+                (itr as IDisposable)?.Dispose();
             }
+
             return null;
         }
     }

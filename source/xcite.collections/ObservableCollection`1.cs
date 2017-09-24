@@ -7,12 +7,9 @@ namespace xcite.collections {
     /// </summary>
     /// <typeparam name="TItem">Data type of managed items</typeparam>
     public class ObservableCollection<TItem> : LinearList<TItem>, IObservableCollection<TItem> {
-        private readonly LinearList<ICollectionListener<TItem>> iRegisteredListener =
-            new LinearList<ICollectionListener<TItem>>();
+        private readonly LinearList<ICollectionListener<TItem>> _registeredListener = new LinearList<ICollectionListener<TItem>>();
 
-        /// <summary>
-        /// Creates a new instance.
-        /// </summary>
+        /// <summary> Initializes the new instance. </summary>
         public ObservableCollection() {
             // Currently nothing to do here
         }
@@ -31,8 +28,8 @@ namespace xcite.collections {
         /// <param name="listener">Listener</param>
         public void AddCollectionListener(ICollectionListener<TItem> listener) {
             if (listener == null) return;
-            lock (iRegisteredListener) {
-                iRegisteredListener.Add(listener);
+            lock (_registeredListener) {
+                _registeredListener.Add(listener);
             }
         }
 
@@ -42,8 +39,8 @@ namespace xcite.collections {
         /// <param name="listener">Listener</param>
         public void RemoveCollectionListener(ICollectionListener<TItem> listener) {
             if (listener == null) return;
-            lock (iRegisteredListener) {
-                iRegisteredListener.Remove(listener);
+            lock (_registeredListener) {
+                _registeredListener.Remove(listener);
             }
         }
 
@@ -101,8 +98,8 @@ namespace xcite.collections {
         /// <param name="dispatchEvent">Action to invoke</param>
         private void DispatchEvent(Action<ICollectionListener<TItem>> dispatchEvent) {
             ICollectionListener<TItem>[] itemSet;
-            lock (iRegisteredListener) {
-                itemSet = iRegisteredListener.ToArray();
+            lock (_registeredListener) {
+                itemSet = _registeredListener.ToArray();
             }
 
             for (int i = -1; ++i != itemSet.Length;) {
