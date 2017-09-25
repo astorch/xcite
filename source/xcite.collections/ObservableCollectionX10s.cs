@@ -13,19 +13,19 @@ namespace xcite.collections {
         /// <param name="collection">Collection to filter</param>
         /// <param name="wherePredicate">Predicate used for filtering</param>
         /// <returns>Observable enumerable with filtered elements</returns>
-        public static IObservableEnumerable<TElement> Where<TElement>(this IObservableCollection<TElement> collection,
+        public static IObservableCollection<TElement> Where<TElement>(this IObservableCollection<TElement> collection,
             Predicate<TElement> wherePredicate) {
             if (collection == null) throw new NullReferenceException();
             if (wherePredicate == null) throw new ArgumentNullException(nameof(wherePredicate));
             
-            return new ObservableEnumerable<TElement>(collection, wherePredicate);
+            return new _ObervableCollection<TElement>(collection, wherePredicate);
         }
 
         /// <summary>
         /// Implements <see cref="IObservableEnumerable{TItem}"/>.
         /// </summary>
         /// <typeparam name="TElement">Type of managed elements</typeparam>
-        class ObservableEnumerable<TElement> : IObservableEnumerable<TElement> {
+        class _ObervableCollection<TElement> : IObservableCollection<TElement> {
             private readonly IObservableCollection<TElement> _originSet;
             private readonly Predicate<TElement> _wherePredicate;
 
@@ -34,15 +34,14 @@ namespace xcite.collections {
             /// </summary>
             /// <param name="originSet">Origin set to iterate</param>
             /// <param name="wherePredicate">Predicate used for filtering</param>
-            public ObservableEnumerable(IObservableCollection<TElement> originSet, Predicate<TElement> wherePredicate) {
+            public _ObervableCollection(IObservableCollection<TElement> originSet, Predicate<TElement> wherePredicate) {
                 _originSet = originSet ?? throw new ArgumentNullException(nameof(originSet));
                 _wherePredicate = wherePredicate ?? throw new ArgumentNullException(nameof(wherePredicate));
             }
 
             /// <inheritdoc />
-            IEnumerator IEnumerable.GetEnumerator() {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() 
+                => GetEnumerator();
 
             /// <inheritdoc />
             public IEnumerator<TElement> GetEnumerator() {
@@ -64,6 +63,55 @@ namespace xcite.collections {
             /// <inheritdoc />
             public void RemoveListener(IEnumerableListener listener) 
                 => _originSet.RemoveListener(listener);
+
+            /// <inheritdoc />
+            public void Add(TElement item)
+                => _originSet.Add(item);
+
+            /// <inheritdoc />
+            public void Clear()
+                => _originSet.Clear();
+
+            /// <inheritdoc />
+            public bool Contains(TElement item) {
+                using (IEnumerator<TElement> itr = GetEnumerator()) {
+                    while (itr.MoveNext()) {
+                        if (Equals(itr.Current, item)) return true;
+                    }
+                }
+
+                return false;
+            }
+
+            /// <inheritdoc />
+            public void CopyTo(TElement[] array, int arrayIndex) {
+                using (IEnumerator<TElement> itr = GetEnumerator()) {
+                    while (itr.MoveNext()) {
+                        array[arrayIndex++] = itr.Current;
+                    }
+                }
+            }
+
+            /// <inheritdoc />
+            public bool Remove(TElement item) 
+                => _originSet.Remove(item);
+
+            /// <inheritdoc />
+            public int Count {
+                get {
+                    int count = 0;
+                    using (IEnumerator<TElement> itr = GetEnumerator()) {
+                        while (itr.MoveNext()) {
+                            count++;
+                        }
+                    }
+
+                    return count;
+                }
+            }
+
+            /// <inheritdoc />
+            public bool IsReadOnly { get; } = true;
 
             /// <summary> Implements a filtering iterator. </summary>
             class FilterIterator : IEnumerator<TElement> {

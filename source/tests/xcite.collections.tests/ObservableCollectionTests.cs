@@ -26,9 +26,32 @@ namespace xcite.collections.tests {
             Assert.AreEqual(3, collectionListener.Added);
         }
 
+        [Test]
+        public void ModifyAndUpdate() {
+            // Arrange
+            ObservableCollection<int> set = new ObservableCollection<int>(new[] {2, 3, 5, 6, 7});
+            IObservableCollection<int> subSet = set.Where(i => i % 2 == 0);
+
+            CollectionListener collectionListener = new CollectionListener();
+            subSet.AddListener(collectionListener);
+
+            int[] array1 = subSet.ToArray();
+
+            // Act
+            subSet.Remove(6);
+            int[] array2 = subSet.ToArray();
+
+            // Assert
+            CollectionAssert.AreEqual(new[] {2, 6}, array1);
+            CollectionAssert.AreEqual(new[] {2}, array2);
+            Assert.AreEqual(1, collectionListener.Removed);
+        }
+
         class CollectionListener : IEnumerableListener<int> {
 
-            public int Added { get; private set; } = 0;
+            public int Added { get; private set; }
+
+            public int Removed { get; private set; } 
 
             /// <inheritdoc />
             public void OnItemAdded(IObservableEnumerable<int> itemCollection, int item) {
@@ -37,7 +60,7 @@ namespace xcite.collections.tests {
 
             /// <inheritdoc />
             public void OnItemRemoved(IObservableEnumerable<int> itemCollection, int item) {
-                
+                Removed++;
             }
 
             /// <inheritdoc />
