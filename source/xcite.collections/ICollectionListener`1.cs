@@ -9,19 +9,19 @@
         /// </summary>
         /// <param name="itemCollection">Modified item collection</param>
         /// <param name="item">Added item</param>
-        void OnItemAdded(IObservableCollection<TItem> itemCollection, TItem item);
+        void OnItemAdded(IObservableEnumerable<TItem> itemCollection, TItem item);
 
         /// <summary>
         /// Is invoked when the given <paramref name="item"/> has been removed from the given <paramref name="itemCollection"/>.
         /// </summary>
         /// <param name="itemCollection">Modified item collection</param>
         /// <param name="item">Removed item</param>
-        void OnItemRemoved(IObservableCollection<TItem> itemCollection, TItem item);
+        void OnItemRemoved(IObservableEnumerable<TItem> itemCollection, TItem item);
 
         /// <summary>
         /// Is invoked when the given <paramref name="itemCollection"/> has been cleared.
         /// </summary>
         /// <param name="itemCollection">Modified item collection</param>
-        void OnCleared(IObservableCollection<TItem> itemCollection);
+        void OnCleared(IObservableEnumerable<TItem> itemCollection);
     }
 }

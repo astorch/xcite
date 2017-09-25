@@ -31,17 +31,17 @@ namespace xcite.collections.tests {
             public int Added { get; private set; } = 0;
 
             /// <inheritdoc />
-            public void OnItemAdded(IObservableCollection<int> itemCollection, int item) {
+            public void OnItemAdded(IObservableEnumerable<int> itemCollection, int item) {
                 Added++;
             }
 
             /// <inheritdoc />
-            public void OnItemRemoved(IObservableCollection<int> itemCollection, int item) {
+            public void OnItemRemoved(IObservableEnumerable<int> itemCollection, int item) {
                 
             }
 
             /// <inheritdoc />
-            public void OnCleared(IObservableCollection<int> itemCollection) {
+            public void OnCleared(IObservableEnumerable<int> itemCollection) {
                 
             }
         }
