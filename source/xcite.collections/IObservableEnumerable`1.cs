@@ -5,17 +5,17 @@ namespace xcite.collections {
     /// Defines an enumerable that publishes events when it has been modified.
     /// </summary>
     /// <typeparam name="TItem">Type of elements managed by this collection</typeparam>
-    public interface IObservableEnumerable<TItem> : IEnumerable<TItem> {
+    public interface IObservableEnumerable<TItem> : IEnumerable<TItem>, IObservableEnumerable {
         /// <summary>
         /// Subscribes the given <paramref name="listener"/> to this instance.
         /// </summary>
         /// <param name="listener">Listener</param>
-        void AddCollectionListener(ICollectionListener<TItem> listener);
+        void AddListener(IEnumerableListener<TItem> listener);
 
         /// <summary>
         /// Unsubscribes the given <paramref name="listener"/> from this instance.
         /// </summary>
         /// <param name="listener">Listener</param>
-        void RemoveCollectionListener(ICollectionListener<TItem> listener);
+        void RemoveListener(IEnumerableListener<TItem> listener);
     }
 }

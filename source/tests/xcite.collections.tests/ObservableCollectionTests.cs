@@ -10,7 +10,7 @@ namespace xcite.collections.tests {
             IObservableEnumerable<int> subset = set.Where(i => i % 2 == 0);
 
             CollectionListener collectionListener = new CollectionListener();
-            subset.AddCollectionListener(collectionListener);
+            subset.AddListener(collectionListener);
             
             int[] array1 = subset.ToArray();
 
@@ -26,7 +26,7 @@ namespace xcite.collections.tests {
             Assert.AreEqual(3, collectionListener.Added);
         }
 
-        class CollectionListener : ICollectionListener<int> {
+        class CollectionListener : IEnumerableListener<int> {
 
             public int Added { get; private set; } = 0;
 

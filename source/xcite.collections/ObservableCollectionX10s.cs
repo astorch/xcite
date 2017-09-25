@@ -50,12 +50,20 @@ namespace xcite.collections {
             }
 
             /// <inheritdoc />
-            public void AddCollectionListener(ICollectionListener<TElement> listener) 
-                => _originSet.AddCollectionListener(listener);
+            public void AddListener(IEnumerableListener<TElement> listener) 
+                => _originSet.AddListener(listener);
 
             /// <inheritdoc />
-            public void RemoveCollectionListener(ICollectionListener<TElement> listener) 
-                => _originSet.RemoveCollectionListener(listener);
+            public void RemoveListener(IEnumerableListener<TElement> listener) 
+                => _originSet.RemoveListener(listener);
+
+            /// <inheritdoc />
+            void IObservableEnumerable.AddListener(IEnumerableListener listener)
+                => _originSet.AddListener(listener);
+
+            /// <inheritdoc />
+            public void RemoveListener(IEnumerableListener listener) 
+                => _originSet.RemoveListener(listener);
 
             /// <summary> Implements a filtering iterator. </summary>
             class FilterIterator : IEnumerator<TElement> {

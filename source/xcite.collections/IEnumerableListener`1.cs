@@ -3,7 +3,7 @@
     /// Defines callbacks to listen to collection changes.
     /// </summary>
     /// <typeparam name="TItem">Type of managed items</typeparam>
-    public interface ICollectionListener<TItem> {
+    public interface IEnumerableListener<TItem> {
         /// <summary>
         /// Is invoked when the given <paramref name="item"/> has been added to the given <paramref name="itemCollection"/>.
         /// </summary>

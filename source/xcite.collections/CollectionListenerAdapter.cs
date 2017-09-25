@@ -42,11 +42,11 @@
     public delegate void CollectionChangedHandler<TItem>(IObservableEnumerable<TItem> collection, CollectionChangedEventArgs<TItem> args);
 
     /// <summary>
-    /// Implements an adapter for <see cref="ICollectionListener{TItem}"/> that raises a single 
+    /// Implements an adapter for <see cref="IEnumerableListener"/> that raises a single 
     /// event when a collection changed event occurred.
     /// </summary>
     /// <typeparam name="TItem">Type of managed items</typeparam>
-    public class CollectionListenerAdapter<TItem> : ICollectionListener<TItem> {
+    public class CollectionListenerAdapter<TItem> : IEnumerableListener<TItem> {
 
         /// <summary> Is raised when a collection changed event occurred. </summary>
         public event CollectionChangedHandler<TItem> CollectionChanged; 
