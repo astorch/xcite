@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <Version>4.2.1</Version>
+    <Version>4.3.0</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Product>xcite collections</Product>
@@ -13,10 +13,9 @@
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>C# .NET xcite collections</PackageTags>
-    <PackageReleaseNotes>- Migrated to .NET Standard 1.6
-- Added support of .NET Core 1.0
-- Added various dispose calls to enumerators
-- Introduced ISortable&lt;T&gt;</PackageReleaseNotes>
+    <PackageReleaseNotes>- Introducing IObservableCollectionSubset
+- Introducing IObservableCollection with where query support
+- Introducing IObservableEnumerable</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
