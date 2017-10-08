@@ -30,7 +30,7 @@ namespace xcite.collections.tests {
         public void ModifyAndUpdate() {
             // Arrange
             ObservableCollection<int> set = new ObservableCollection<int>(new[] {2, 3, 5, 6, 7});
-            IObservableCollection<int> subSet = set.Where(i => i % 2 == 0);
+            IObservableCollectionSubset<int> subSet = set.Where(i => i % 2 == 0);
 
             CollectionListener collectionListener = new CollectionListener();
             subSet.AddListener(collectionListener);
@@ -44,6 +44,27 @@ namespace xcite.collections.tests {
             // Assert
             CollectionAssert.AreEqual(new[] {2, 6}, array1);
             CollectionAssert.AreEqual(new[] {2}, array2);
+            Assert.AreEqual(1, collectionListener.Removed);
+        }
+
+        [Test]
+        public void ModifyOnlySubset() {
+            // Arrange
+            ObservableCollection<int> set = new ObservableCollection<int>(new[] { 2, 3, 5, 6, 7 });
+            IObservableCollectionSubset<int> subSet = set.Where(i => i % 2 == 0);
+
+            CollectionListener collectionListener = new CollectionListener();
+            subSet.AddListener(collectionListener);
+
+            int[] array1 = subSet.ToArray();
+
+            // Act
+            subSet.Remove(6, false);
+            int[] array2 = subSet.ToArray();
+
+            // Assert
+            CollectionAssert.AreEqual(new[] { 2, 6 }, array1);
+            CollectionAssert.AreEqual(new[] { 2, 6 }, array2);
             Assert.AreEqual(1, collectionListener.Removed);
         }
 

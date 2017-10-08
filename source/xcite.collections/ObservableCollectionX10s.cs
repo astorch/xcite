@@ -13,19 +13,21 @@ namespace xcite.collections {
         /// <param name="collection">Collection to filter</param>
         /// <param name="wherePredicate">Predicate used for filtering</param>
         /// <returns>Observable enumerable with filtered elements</returns>
-        public static IObservableCollection<TElement> Where<TElement>(this IObservableCollection<TElement> collection,
+        public static IObservableCollectionSubset<TElement> Where<TElement>(this IObservableCollection<TElement> collection,
             Predicate<TElement> wherePredicate) {
             if (collection == null) throw new NullReferenceException();
             if (wherePredicate == null) throw new ArgumentNullException(nameof(wherePredicate));
             
-            return new _ObervableCollection<TElement>(collection, wherePredicate);
+            return new ObervableCollectionSubset<TElement>(collection, wherePredicate);
         }
 
         /// <summary>
-        /// Implements <see cref="IObservableEnumerable{TItem}"/>.
+        /// Implements <see cref="IObservableCollection{TItem}"/>.
         /// </summary>
         /// <typeparam name="TElement">Type of managed elements</typeparam>
-        class _ObervableCollection<TElement> : IObservableCollection<TElement> {
+        class ObervableCollectionSubset<TElement> : IObservableCollectionSubset<TElement> {
+            private readonly LinearList<IEnumerableListener<TElement>> _genericListener = new LinearList<IEnumerableListener<TElement>>();
+            private readonly LinearList<IEnumerableListener> _listener = new LinearList<IEnumerableListener>();
             private readonly IObservableCollection<TElement> _originSet;
             private readonly Predicate<TElement> _wherePredicate;
 
@@ -34,7 +36,7 @@ namespace xcite.collections {
             /// </summary>
             /// <param name="originSet">Origin set to iterate</param>
             /// <param name="wherePredicate">Predicate used for filtering</param>
-            public _ObervableCollection(IObservableCollection<TElement> originSet, Predicate<TElement> wherePredicate) {
+            public ObervableCollectionSubset(IObservableCollection<TElement> originSet, Predicate<TElement> wherePredicate) {
                 _originSet = originSet ?? throw new ArgumentNullException(nameof(originSet));
                 _wherePredicate = wherePredicate ?? throw new ArgumentNullException(nameof(wherePredicate));
             }
@@ -49,24 +51,41 @@ namespace xcite.collections {
             }
 
             /// <inheritdoc />
-            public void AddListener(IEnumerableListener<TElement> listener) 
-                => _originSet.AddListener(listener);
+            public void AddListener(IEnumerableListener<TElement> listener) {
+                _originSet.AddListener(listener);
+                _genericListener.Add(listener);
+            }
 
             /// <inheritdoc />
-            public void RemoveListener(IEnumerableListener<TElement> listener) 
-                => _originSet.RemoveListener(listener);
+            public void RemoveListener(IEnumerableListener<TElement> listener) {
+                _genericListener.Remove(listener);
+                _originSet.RemoveListener(listener);
+            }
 
             /// <inheritdoc />
-            void IObservableEnumerable.AddListener(IEnumerableListener listener)
-                => _originSet.AddListener(listener);
+            void IObservableEnumerable.AddListener(IEnumerableListener listener) {
+                _originSet.AddListener(listener);
+                _listener.Add(listener);
+            }
 
             /// <inheritdoc />
-            public void RemoveListener(IEnumerableListener listener) 
-                => _originSet.RemoveListener(listener);
+            void IObservableEnumerable.RemoveListener(IEnumerableListener listener) {
+                _listener.Remove(listener);
+                _originSet.RemoveListener(listener);
+            }
 
             /// <inheritdoc />
             public void Add(TElement item)
-                => _originSet.Add(item);
+                => Add(item, true);
+
+            /// <inheritdoc />
+            public void Add(TElement item, bool modifySource) {
+                if (modifySource) {
+                    _originSet.Add(item);
+                } else {
+                    RaiseFakeCollectionChangedEvent(true, item);
+                }
+            }
 
             /// <inheritdoc />
             public void Clear()
@@ -93,8 +112,16 @@ namespace xcite.collections {
             }
 
             /// <inheritdoc />
-            public bool Remove(TElement item) 
-                => _originSet.Remove(item);
+            public bool Remove(TElement item)
+                => Remove(item, true);
+
+            /// <inheritdoc />
+            public bool Remove(TElement item, bool modifySource) {
+                if (modifySource) return _originSet.Remove(item);
+
+                RaiseFakeCollectionChangedEvent(false, item);
+                return true;
+            }
 
             /// <inheritdoc />
             public int Count {
@@ -112,6 +139,27 @@ namespace xcite.collections {
 
             /// <inheritdoc />
             public bool IsReadOnly { get; } = true;
+
+            /// <summary>
+            /// Raises a fake collection changed event.
+            /// </summary>
+            /// <param name="add">TRUE if an add event shall be raised</param>
+            /// <param name="item">Item that has been affected</param>
+            private void RaiseFakeCollectionChangedEvent(bool add, TElement item) {
+                Action<IEnumerableListener<TElement>> genericAction;
+                Action<IEnumerableListener> rawAction;
+
+                if (add) {
+                    genericAction = l => l.OnItemAdded(this, item);
+                    rawAction = l => l.OnItemAdded(this, item);
+                } else {
+                    genericAction = l => l.OnItemRemoved(this, item);
+                    rawAction = l => l.OnItemRemoved(this, item);
+                }
+
+                _listener.ForEach(rawAction);
+                _genericListener.ForEach(genericAction);
+            }
 
             /// <summary> Implements a filtering iterator. </summary>
             class FilterIterator : IEnumerator<TElement> {
