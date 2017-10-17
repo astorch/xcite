@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <Version>4.1.0</Version>
+    <Version>4.1.1</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Description>Provides various c# programming extensions for .NET.</Description>
@@ -11,7 +11,7 @@
     <PackageTags>C# .NET xcite csharp</PackageTags>
     <PackageLicenseUrl>https://github.com/astorch/xcite</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/astorch/xcite</PackageProjectUrl>
-    <PackageReleaseNotes>Migrated to .NET Standard 1.6</PackageReleaseNotes>
+    <PackageReleaseNotes>- Fixed XEnum error</PackageReleaseNotes>
     <Product>xcite csharp</Product>
     <RepositoryType>GIT</RepositoryType>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>

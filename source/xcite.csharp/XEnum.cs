@@ -7,10 +7,10 @@ namespace xcite.csharp {
     /// <typeparam name="TEnum">Type of enum</typeparam>
     public abstract class XEnum<TEnum> where TEnum : XEnum<TEnum> //: IComparable, IFormattable, IConvertible 
     {
-        private static TEnum[] iValues;
+        private static TEnum[] _values;
 
         /// <summary> Returns all values of this enumeration. </summary>
-        public static readonly TEnum[] Values = ReadEnumFields();
+        public static TEnum[] Values => _values ?? (_values = ReadEnumFields());
 
         /// <summary>
         /// Resolves all values of this enumeration type. 
@@ -20,8 +20,7 @@ namespace xcite.csharp {
             Type type = typeof(TEnum);
 //            FieldInfo[] fields = type.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Static);
             FieldInfo[] fields = type.GetRuntimeFields().ToArray();
-            iValues = fields.Select(field => field.GetValue(null)).Cast<TEnum>().ToArray();
-            return iValues;
+            return fields.Select(field => field.GetValue(null)).Cast<TEnum>().ToArray();
         }
 
         /// <summary>
