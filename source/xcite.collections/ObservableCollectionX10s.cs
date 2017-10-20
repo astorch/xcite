@@ -42,7 +42,31 @@ namespace xcite.collections {
                 _wherePredicate = wherePredicate ?? throw new ArgumentNullException(nameof(wherePredicate));
 
                 // If the collection has been changed, we need to clear the cache
-                _originSet.AddListener(new CollectionListenerAdapter((collection, args) => _elementCache = null));
+                _originSet.AddListener(new CollectionListenerAdapter<TElement>(OnOriginSetChanged));
+            }
+
+            /// <summary>
+            /// Is invoked when the origin set has been changed.
+            /// </summary>
+            /// <param name="collection">Modified collection</param>
+            /// <param name="args">Event arguments</param>
+            private void OnOriginSetChanged(IObservableEnumerable<TElement> collection, CollectionChangedEventArgs<TElement> args) {
+                if (_elementCache == null) return; // Elements haven't been request yet
+
+                // If the origin set has been clear, there can't be any elements
+                if (args.Reason == ECollectionChangeReason.Cleared) {
+                    _elementCache.Clear();
+                    return;
+                }
+
+                // An item has been added or removed, but is it relevant for this subset?
+                bool isRelevant = _wherePredicate(args.Item);
+                if (!isRelevant) return;
+                
+                if (args.Reason == ECollectionChangeReason.Added)
+                    _elementCache.Add(args.Item);
+                else
+                    _elementCache.Remove(args.Item);
             }
 
             /// <inheritdoc />
