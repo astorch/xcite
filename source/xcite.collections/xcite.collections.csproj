@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <Version>4.3.2</Version>
+    <Version>4.3.3</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Product>xcite collections</Product>
@@ -14,7 +14,8 @@
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>C# .NET xcite collections</PackageTags>
     <PackageReleaseNotes>- Added cache to ObservableCollectionSubset to avoid multiple iterations
-- Simplified CollectionListenerAdapter usage</PackageReleaseNotes>
+- Simplified CollectionListenerAdapter usage
+- ObservableCollectionSubset is now thread-safe</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>

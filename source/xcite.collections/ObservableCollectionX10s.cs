@@ -51,22 +51,24 @@ namespace xcite.collections {
             /// <param name="collection">Modified collection</param>
             /// <param name="args">Event arguments</param>
             private void OnOriginSetChanged(IObservableEnumerable<TElement> collection, CollectionChangedEventArgs<TElement> args) {
-                if (_elementCache == null) return; // Elements haven't been request yet
+                lock (_originSet) {
+                    if (_elementCache == null) return; // Elements haven't been request yet
 
-                // If the origin set has been clear, there can't be any elements
-                if (args.Reason == ECollectionChangeReason.Cleared) {
-                    _elementCache.Clear();
-                    return;
+                    // If the origin set has been clear, there can't be any elements
+                    if (args.Reason == ECollectionChangeReason.Cleared) {
+                        _elementCache.Clear();
+                        return;
+                    }
+
+                    // An item has been added or removed, but is it relevant for this subset?
+                    bool isRelevant = _wherePredicate(args.Item);
+                    if (!isRelevant) return;
+
+                    if (args.Reason == ECollectionChangeReason.Added)
+                        _elementCache.Add(args.Item);
+                    else
+                        _elementCache.Remove(args.Item);
                 }
-
-                // An item has been added or removed, but is it relevant for this subset?
-                bool isRelevant = _wherePredicate(args.Item);
-                if (!isRelevant) return;
-                
-                if (args.Reason == ECollectionChangeReason.Added)
-                    _elementCache.Add(args.Item);
-                else
-                    _elementCache.Remove(args.Item);
             }
 
             /// <inheritdoc />
@@ -75,17 +77,19 @@ namespace xcite.collections {
 
             /// <inheritdoc />
             public IEnumerator<TElement> GetEnumerator() {
-                if (_elementCache != null) return _elementCache.GetEnumerator();
+                lock (_originSet) {
+                    if (_elementCache != null) return _elementCache.GetEnumerator();
 
-                // Copy all matching items into the cache
-                _elementCache = new LinearList<TElement>();
-                using (FilterIterator itr = new FilterIterator(_originSet.GetEnumerator(), _wherePredicate)) {
-                    while (itr.MoveNext()) {
-                        _elementCache.Add(itr.Current);
+                    // Copy all matching items into the cache
+                    _elementCache = new LinearList<TElement>();
+                    using (FilterIterator itr = new FilterIterator(_originSet.GetEnumerator(), _wherePredicate)) {
+                        while (itr.MoveNext()) {
+                            _elementCache.Add(itr.Current);
+                        }
                     }
-                }
 
-                return _elementCache.GetEnumerator();
+                    return _elementCache.GetEnumerator();
+                }
             }
 
             /// <inheritdoc />
