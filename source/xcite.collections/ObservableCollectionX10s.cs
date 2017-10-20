@@ -26,6 +26,10 @@ namespace xcite.collections {
         /// </summary>
         /// <typeparam name="TElement">Type of managed elements</typeparam>
         class ObervableCollectionSubset<TElement> : IObservableCollectionSubset<TElement> {
+            private const ushort AddEvent = 1;
+            private const ushort RemoveEvent = 2;
+            private const ushort ClearEvent = 3;
+
             private readonly LinearList<IEnumerableListener<TElement>> _genericListener = new LinearList<IEnumerableListener<TElement>>();
             private readonly LinearList<IEnumerableListener> _listener = new LinearList<IEnumerableListener>();
             private readonly IObservableCollection<TElement> _originSet;
@@ -57,6 +61,7 @@ namespace xcite.collections {
                     // If the origin set has been clear, there can't be any elements
                     if (args.Reason == ECollectionChangeReason.Cleared) {
                         _elementCache.Clear();
+                        RaiseFakeCollectionChangedEvent(ClearEvent, default(TElement));
                         return;
                     }
 
@@ -64,10 +69,13 @@ namespace xcite.collections {
                     bool isRelevant = _wherePredicate(args.Item);
                     if (!isRelevant) return;
 
-                    if (args.Reason == ECollectionChangeReason.Added)
+                    if (args.Reason == ECollectionChangeReason.Added) {
                         _elementCache.Add(args.Item);
-                    else
+                        RaiseFakeCollectionChangedEvent(AddEvent, args.Item);
+                    } else {
                         _elementCache.Remove(args.Item);
+                        RaiseFakeCollectionChangedEvent(RemoveEvent, args.Item);
+                    }
                 }
             }
 
@@ -94,26 +102,22 @@ namespace xcite.collections {
 
             /// <inheritdoc />
             public void AddListener(IEnumerableListener<TElement> listener) {
-                _originSet.AddListener(listener);
                 _genericListener.Add(listener);
             }
 
             /// <inheritdoc />
             public void RemoveListener(IEnumerableListener<TElement> listener) {
                 _genericListener.Remove(listener);
-                _originSet.RemoveListener(listener);
             }
 
             /// <inheritdoc />
             void IObservableEnumerable.AddListener(IEnumerableListener listener) {
-                _originSet.AddListener(listener);
                 _listener.Add(listener);
             }
 
             /// <inheritdoc />
             void IObservableEnumerable.RemoveListener(IEnumerableListener listener) {
                 _listener.Remove(listener);
-                _originSet.RemoveListener(listener);
             }
 
             /// <inheritdoc />
@@ -125,7 +129,7 @@ namespace xcite.collections {
                 if (modifySource) {
                     _originSet.Add(item);
                 } else {
-                    RaiseFakeCollectionChangedEvent(true, item);
+                    RaiseFakeCollectionChangedEvent(AddEvent, item);
                 }
             }
 
@@ -161,7 +165,7 @@ namespace xcite.collections {
             public bool Remove(TElement item, bool modifySource) {
                 if (modifySource) return _originSet.Remove(item);
 
-                RaiseFakeCollectionChangedEvent(false, item);
+                RaiseFakeCollectionChangedEvent(RemoveEvent, item);
                 return true;
             }
 
@@ -185,18 +189,21 @@ namespace xcite.collections {
             /// <summary>
             /// Raises a fake collection changed event.
             /// </summary>
-            /// <param name="add">TRUE if an add event shall be raised</param>
+            /// <param name="eventType">Event type</param>
             /// <param name="item">Item that has been affected</param>
-            private void RaiseFakeCollectionChangedEvent(bool add, TElement item) {
+            private void RaiseFakeCollectionChangedEvent(ushort eventType, TElement item) {
                 Action<IEnumerableListener<TElement>> genericAction;
                 Action<IEnumerableListener> rawAction;
 
-                if (add) {
+                if (eventType == AddEvent) {
                     genericAction = l => l.OnItemAdded(this, item);
                     rawAction = l => l.OnItemAdded(this, item);
-                } else {
+                } else if (eventType == RemoveEvent) {
                     genericAction = l => l.OnItemRemoved(this, item);
                     rawAction = l => l.OnItemRemoved(this, item);
+                } else {
+                    genericAction = l => l.OnCleared(this);
+                    rawAction = l => l.OnCleared(this);
                 }
 
                 _listener.ForEach(rawAction);
