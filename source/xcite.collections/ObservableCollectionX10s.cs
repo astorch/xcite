@@ -30,6 +30,7 @@ namespace xcite.collections {
             private readonly LinearList<IEnumerableListener> _listener = new LinearList<IEnumerableListener>();
             private readonly IObservableCollection<TElement> _originSet;
             private readonly Predicate<TElement> _wherePredicate;
+            private LinearList<TElement> _elementCache;
 
             /// <summary>
             /// Initializes the new instance.
@@ -39,6 +40,9 @@ namespace xcite.collections {
             public ObervableCollectionSubset(IObservableCollection<TElement> originSet, Predicate<TElement> wherePredicate) {
                 _originSet = originSet ?? throw new ArgumentNullException(nameof(originSet));
                 _wherePredicate = wherePredicate ?? throw new ArgumentNullException(nameof(wherePredicate));
+
+                // If the collection has been changed, we need to clear the cache
+                _originSet.AddListener(new CollectionListenerAdapter((collection, args) => _elementCache = null));
             }
 
             /// <inheritdoc />
@@ -47,7 +51,17 @@ namespace xcite.collections {
 
             /// <inheritdoc />
             public IEnumerator<TElement> GetEnumerator() {
-                return new FilterIterator(_originSet.GetEnumerator(), _wherePredicate);
+                if (_elementCache != null) return _elementCache.GetEnumerator();
+
+                // Copy all matching items into the cache
+                _elementCache = new LinearList<TElement>();
+                using (FilterIterator itr = new FilterIterator(_originSet.GetEnumerator(), _wherePredicate)) {
+                    while (itr.MoveNext()) {
+                        _elementCache.Add(itr.Current);
+                    }
+                }
+
+                return _elementCache.GetEnumerator();
             }
 
             /// <inheritdoc />

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <Version>4.3.0</Version>
+    <Version>4.3.1</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Product>xcite collections</Product>
@@ -13,9 +13,8 @@
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>C# .NET xcite collections</PackageTags>
-    <PackageReleaseNotes>- Introducing IObservableCollectionSubset
-- Introducing IObservableCollection with where query support
-- Introducing IObservableEnumerable</PackageReleaseNotes>
+    <PackageReleaseNotes>- Added cache to ObservableCollectionSubset to avoid multiple iterations
+- Simplified CollectionListenerAdapter usage</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
