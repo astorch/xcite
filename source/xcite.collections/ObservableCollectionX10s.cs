@@ -61,7 +61,7 @@ namespace xcite.collections {
                     // If the origin set has been clear, there can't be any elements
                     if (args.Reason == ECollectionChangeReason.Cleared) {
                         _elementCache.Clear();
-                        RaiseFakeCollectionChangedEvent(ClearEvent, default(TElement));
+                        RaiseSubsetChangedEvent(ClearEvent, default(TElement));
                         return;
                     }
 
@@ -71,10 +71,10 @@ namespace xcite.collections {
 
                     if (args.Reason == ECollectionChangeReason.Added) {
                         _elementCache.Add(args.Item);
-                        RaiseFakeCollectionChangedEvent(AddEvent, args.Item);
+                        RaiseSubsetChangedEvent(AddEvent, args.Item);
                     } else {
                         _elementCache.Remove(args.Item);
-                        RaiseFakeCollectionChangedEvent(RemoveEvent, args.Item);
+                        RaiseSubsetChangedEvent(RemoveEvent, args.Item);
                     }
                 }
             }
@@ -128,9 +128,18 @@ namespace xcite.collections {
             public void Add(TElement item, bool modifySource) {
                 if (modifySource) {
                     _originSet.Add(item);
-                } else {
-                    RaiseFakeCollectionChangedEvent(AddEvent, item);
+                    return;
                 }
+
+                lock (_originSet) {
+                    // Item is not relevant
+                    if (!_wherePredicate(item)) return;
+
+                    // Item is relevant
+                    _elementCache.Add(item);
+                }
+
+                RaiseSubsetChangedEvent(AddEvent, item);
             }
 
             /// <inheritdoc />
@@ -165,13 +174,27 @@ namespace xcite.collections {
             public bool Remove(TElement item, bool modifySource) {
                 if (modifySource) return _originSet.Remove(item);
 
-                RaiseFakeCollectionChangedEvent(RemoveEvent, item);
-                return true;
+                bool removeResult;
+                lock (_originSet) {
+                    // Item is not relevant
+                    if (!_wherePredicate(item)) return false;
+
+                    // Item is relevant
+                    removeResult = _elementCache.Remove(item);
+                }
+
+                RaiseSubsetChangedEvent(RemoveEvent, item);
+                return removeResult;
             }
 
             /// <inheritdoc />
             public int Count {
                 get {
+                    lock (_originSet) {
+                        // Small performance tweak: don't iterate if we have a cache
+                        if (_elementCache != null) return _elementCache.Count;
+                    }
+
                     int count = 0;
                     using (IEnumerator<TElement> itr = GetEnumerator()) {
                         while (itr.MoveNext()) {
@@ -191,7 +214,7 @@ namespace xcite.collections {
             /// </summary>
             /// <param name="eventType">Event type</param>
             /// <param name="item">Item that has been affected</param>
-            private void RaiseFakeCollectionChangedEvent(ushort eventType, TElement item) {
+            private void RaiseSubsetChangedEvent(ushort eventType, TElement item) {
                 Action<IEnumerableListener<TElement>> genericAction;
                 Action<IEnumerableListener> rawAction;
 

@@ -23,7 +23,8 @@ namespace xcite.collections.tests {
             // Assert
             CollectionAssert.AreEqual(new[] {2, 4, 6, 8}, array1);
             CollectionAssert.AreEqual(new[] {2, 4, 6, 8, 12, 14}, array2);
-            Assert.AreEqual(3, collectionListener.Added);
+            CollectionAssert.AreEqual(new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14}, set); // Origin set must(!) be modified
+            Assert.AreEqual(2, collectionListener.Added);
         }
 
         [Test]
@@ -44,6 +45,7 @@ namespace xcite.collections.tests {
             // Assert
             CollectionAssert.AreEqual(new[] {2, 6}, array1);
             CollectionAssert.AreEqual(new[] {2}, array2);
+            CollectionAssert.AreEqual(new[] { 2, 3, 5, 7 }, set); // Origin set must(!) be modified
             Assert.AreEqual(1, collectionListener.Removed);
         }
 
@@ -64,7 +66,8 @@ namespace xcite.collections.tests {
 
             // Assert
             CollectionAssert.AreEqual(new[] { 2, 6 }, array1);
-            CollectionAssert.AreEqual(new[] { 2, 6 }, array2);
+            CollectionAssert.AreEqual(new[] { 2 }, array2);
+            CollectionAssert.AreEqual(new[] { 2, 3, 5, 6, 7 }, set); // Origin set mustn't be modified
             Assert.AreEqual(1, collectionListener.Removed);
         }
 
