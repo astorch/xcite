@@ -174,17 +174,12 @@ namespace xcite.collections {
             public bool Remove(TElement item, bool modifySource) {
                 if (modifySource) return _originSet.Remove(item);
 
-                bool removeResult;
                 lock (_originSet) {
-                    // Item is not relevant
-                    if (!_wherePredicate(item)) return false;
-
-                    // Item is relevant
-                    removeResult = _elementCache.Remove(item);
+                    if (!_elementCache.Remove(item)) return false;
                 }
 
                 RaiseSubsetChangedEvent(RemoveEvent, item);
-                return removeResult;
+                return true;
             }
 
             /// <inheritdoc />
