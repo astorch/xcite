@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 
 namespace xcite.collections.tests {
     [TestFixture]

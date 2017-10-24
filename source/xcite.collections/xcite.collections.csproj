@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <Version>4.3.6</Version>
+    <Version>5.0.0</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Product>xcite collections</Product>
@@ -13,9 +13,8 @@
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>C# .NET xcite collections</PackageTags>
-    <PackageReleaseNotes>- Added cache to ObservableCollectionSubset to avoid multiple iterations
-- Simplified CollectionListenerAdapter usage
-- ObservableCollectionSubset is now thread-safe</PackageReleaseNotes>
+    <PackageReleaseNotes>- Added nogen namespace
+- Added various extension methods for IEnumerable</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
