@@ -42,5 +42,40 @@ namespace xcite.collections {
             TItem[] resultingArray = linkedList.ToArray();
             return resultingArray;
         }
+
+        /// <summary>
+        /// Returns the index of the specified <paramref name="item"/> in the <paramref name="sequence"/>. 
+        /// If the sequence does not contain the element, -1 is returned. Note, the lookup is performed 
+        /// using <see cref="object.Equals(object)"/>
+        /// </summary>
+        /// <typeparam name="TItem">Type of managed items</typeparam>
+        /// <param name="sequence">Sequence to process</param>
+        /// <param name="item">Item which index to look up</param>
+        /// <returns>Index of the item or -1</returns>
+        public static int IndexOf<TItem>(this IEnumerable<TItem> sequence, TItem item) {
+            return IndexOf(sequence, seqItem => Equals(seqItem, item));
+        }
+
+        /// <summary>
+        /// Returns the index of the first item that matches the specified <paramref name="predicate"/> in the <paramref name="sequence"/>. 
+        /// If the sequence does not contain an element, -1 is returned.
+        /// </summary>
+        /// <typeparam name="TItem">Type of managed items</typeparam>
+        /// <param name="sequence">Sequence to process</param>
+        /// <param name="predicate">Predicate to find the desired element</param>
+        /// <returns>Index of the item or -1</returns>
+        public static int IndexOf<TItem>(this IEnumerable<TItem> sequence, Predicate<TItem> predicate) {
+            if (sequence == null) throw new ArgumentNullException();
+
+            int index = -1;
+            using (var itr = sequence.GetEnumerator()) {
+                while (itr.MoveNext()) {
+                    index++;
+                    if (predicate(itr.Current)) return index;
+                }
+            }
+
+            return -1;
+        }
     }
 }

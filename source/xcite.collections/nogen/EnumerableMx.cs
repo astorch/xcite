@@ -5,6 +5,37 @@ using System.Collections.Generic;
 namespace xcite.collections.nogen {
     /// <summary> Implements extension methods for <see cref="IEnumerable"/>. </summary>
     public static class EnumerableMx {
+
+        /// <summary>
+        /// Returns the index of the specified <paramref name="item"/> in the <paramref name="sequence"/>. 
+        /// If the sequence does not contain the element, -1 is returned. Note, the lookup is performed 
+        /// using <see cref="object.Equals(object)"/>
+        /// </summary>
+        /// <param name="sequence">Sequence to process</param>
+        /// <param name="item">Item which index to look up</param>
+        /// <returns>Index of the item or -1</returns>
+        public static int IndexOf(this IEnumerable sequence, object item) {
+            return IndexOf(sequence, seqItem => Equals(seqItem, item));
+        }
+
+        /// <summary>
+        /// Returns the index of the first item that matches the specified <paramref name="predicate"/> in the <paramref name="sequence"/>. 
+        /// If the sequence does not contain an element, -1 is returned.
+        /// </summary>
+        /// <param name="sequence">Sequence to process</param>
+        /// <param name="predicate">Predicate to find the desired element</param>
+        /// <returns>Index of the item or -1</returns>
+        public static int IndexOf(this IEnumerable sequence, Predicate<object> predicate) {
+            return Iterate(sequence, itr => {
+                int index = -1;
+                while (itr.MoveNext()) {
+                    index++;
+                    if (predicate(itr.Current)) return index;
+                }
+                return -1;
+            });
+        }
+
         /// <summary>
         /// Returns TRUE if the sequence contains any element.
         /// </summary>
