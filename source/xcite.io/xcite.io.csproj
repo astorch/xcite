@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6</TargetFrameworks>
-	<Version>2.0.0</Version>    
+    <TargetFrameworks>net462;netstandard1.6</TargetFrameworks>
+	<Version>3.0.0</Version>    
 	<Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Product>xcite io</Product>
@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>C# .NET xcite io</PackageTags>
-    <PackageReleaseNotes>Migrated to .NETStandard 1.6</PackageReleaseNotes>
+    <PackageReleaseNotes>- DLL per target framework .NET462 and .NET Standard 1.6</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
