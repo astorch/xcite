@@ -48,7 +48,7 @@ namespace xcite.csharp {
         /// <exception cref="InvalidOperationException">If the configuration reference a property that could not be found</exception>
         public TObject Read<TObject>(string[] textLines) where TObject : new() {
             TObject obj = new TObject();
-            PropertyInfo[] objPropSet = typeof(TObject).GetPublicProperties();
+            PropertyInfo[] objPropSet = typeof(TObject).GetTypeInfo().GetProperties();
             if (objPropSet.Length == 0) return obj;
             
             for (int i = -1; ++i != textLines.Length;) {
@@ -99,7 +99,7 @@ namespace xcite.csharp {
 
                 // Resolve sub path
                 string subPath = name.Substring(splitIndex + 1);
-                PropertyInfo[] subProperties = property.PropertyType.GetPublicProperties();
+                PropertyInfo[] subProperties = property.PropertyType.GetTypeInfo().GetProperties();
 
                 name = subPath;
                 properties = subProperties;

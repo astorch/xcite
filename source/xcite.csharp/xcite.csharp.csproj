@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net462;netstandard1.6</TargetFrameworks>
-    <Version>5.1.0</Version>
+    <Version>5.1.1</Version>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Description>Provides various c# programming extensions for .NET.</Description>
@@ -10,7 +10,8 @@
     <PackageTags>C# .NET xcite csharp</PackageTags>
     <PackageLicenseUrl>https://github.com/astorch/xcite</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/astorch/xcite</PackageProjectUrl>
-    <PackageReleaseNotes>- Introducing PlatesReader</PackageReleaseNotes>
+    <PackageReleaseNotes>- Fixed issue when resolving inherited properties
+</PackageReleaseNotes>
     <Product>xcite csharp</Product>
     <RepositoryType>GIT</RepositoryType>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
