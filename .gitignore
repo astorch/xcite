@@ -4,6 +4,7 @@ packages
 tools
 .binaries
 .vs
+.idea
 _ReSharper.*/
 *.testsettings
 *.user
