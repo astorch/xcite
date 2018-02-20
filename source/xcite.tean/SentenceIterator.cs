@@ -37,13 +37,13 @@ namespace xcite.tean {
 
                 // TODO escape strings
                 
-                // Sentence ends here, if the punc mark is not part of an URL
-                if (isPuncMark && !IsUrl(_charSet, i)) {
+                // Sentence ends here, if the punc mark does not indiciate a special construction
+                if (isPuncMark && !IsSpecialCon(_charSet, i, _lang)) {
                     int end = i + 1;
                     int length = end - _p;
                     Array.Copy(_charSet, _p, _buffer, 0, length);
                     string text = new string(_buffer, 0, length);
-                    Current = new Sentence(text, _p, end);
+                    Current = new Sentence(text, _p);
 
                     int n = end;
                     
@@ -79,9 +79,72 @@ namespace xcite.tean {
 
         /// <summary>
         /// Returns TRUE if the punctuation mark at the specified index of the given <paramref name="charSet"/>
+        /// indicates a special language construction like an URL, date or time instant.
+        /// </summary>
+        /// <param name="charSet">Character set</param>
+        /// <param name="pmIndex">Punctuation mark index</param>
+        /// <param name="lang">Language info</param>
+        /// <returns>TRUE or FALSE</returns>
+        private static bool IsSpecialCon(char[] charSet, int pmIndex, ILangInfo lang) {
+            if (IsUrl(charSet, pmIndex)) return true;
+            if (IsDate(charSet, pmIndex, lang.DateSeparator)) return true;
+            if (IsTime(charSet, pmIndex, lang.TimeSeparator)) return true;
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Returns TRUE if the punctuation <paramref name="mark"/> at the specified index of the given <paramref name="charSet"/>
+        /// indicates a time.
+        /// </summary>
+        /// <param name="charSet">Character set</param>
+        /// <param name="pmIndex">Punctuation mark index</param>
+        /// <param name="mark">Punctuation mark</param>
+        /// <returns>TRUE or FALSE</returns>
+        private static bool IsTime(char[] charSet, int pmIndex, char mark) {
+            // Only the specified mark is relevant
+            if (charSet[pmIndex] != mark) return false;
+
+            int np1 = pmIndex + 1;
+            // If we've reached the end of the stream, this is no date
+            if (np1 == charSet.Length) return false;
+            char m = charSet[np1];
+            
+            // The mark is followed by a bias token, this is no date
+            if (IsBias(m)) return false;
+            
+            return true;
+        }
+        
+        /// <summary>
+        /// Returns TRUE if the punctuation <paramref name="mark"/> at the specified index of the given <paramref name="charSet"/>
+        /// indicates a date.
+        /// </summary>
+        /// <param name="charSet">Character set</param>
+        /// <param name="pmIndex">Punctuation mark index</param>
+        /// <param name="mark">Punctuation mark</param>
+        /// <returns>TRUE or FALSE</returns>
+        private static bool IsDate(char[] charSet, int pmIndex, char mark) {
+            // Only the specified mark is relevant
+            if (charSet[pmIndex] != mark) return false;
+
+            int np1 = pmIndex + 1;
+            
+            // If we've reached the end of the stream, this is no date
+            if (np1 == charSet.Length) return false;
+            char m = charSet[np1];
+            
+            // The mark is followed by a bias token, this is no date
+            if (IsBias(m)) return false;
+            
+            return true;
+        }
+        
+        /// <summary>
+        /// Returns TRUE if the punctuation mark at the specified index of the given <paramref name="charSet"/>
         /// indicates an URL.
         /// </summary>
-        /// <param name="charSet">Char set</param>
+        /// <param name="charSet">Character set</param>
         /// <param name="pmIndex">Punctuation mark index</param>
         /// <returns>TRUE or FALSE</returns>
         private static bool IsUrl(char[] charSet, int pmIndex) {

@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="SentenceIteratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SentenceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\xcite.tean\xcite.tean.csproj">
@@ -56,6 +57,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="samples\text-sample2.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="samples\text-sample3.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

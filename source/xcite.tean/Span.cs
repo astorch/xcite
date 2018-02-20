@@ -8,12 +8,10 @@ namespace xcite.tean {
         /// <summary> Initializes the new instance. </summary>
         /// <param name="text">Text</param>
         /// <param name="begin">Begin</param>
-        /// <param name="end">End</param>
-        protected Span(string text, int begin, int end) {
+        protected Span(string text, int begin) {
             Text = text;
             Begin = begin;
-            End = end;
-            Length = end - begin;
+            End = begin + text.Length;
         }
 
         /// <summary> Text </summary>
@@ -24,8 +22,9 @@ namespace xcite.tean {
         
         /// <summary> End </summary>
         public int End { get; }
-        
+
         /// <summary> Length </summary>
-        public int Length { get; }
+        public int Length
+            => Text.Length;
     }
 }

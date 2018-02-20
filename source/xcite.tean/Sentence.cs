@@ -5,9 +5,45 @@ namespace xcite.tean {
     /// <summary> Area within a string that can be interpreted as sentence. </summary>
     [DebuggerDisplay("Sentence: {Begin}-{End} Text: '{Text}'")]
     public class Sentence : Span {
+        private string _plainText;
+        
         /// <inheritdoc />
-        public Sentence(string text, int begin, int end) : base(text, begin, end) {
+        public Sentence(string text, int begin) : base(text, begin) {
             // Accomplish base initializer
+        }
+
+        /// <summary> <see cref="Span.Text"/> without any linefeeds or tabs. </summary>
+        public string PlainText => _plainText ?? (_plainText = SanitizeText(Text));
+
+        /// <summary>
+        /// Removes all linefeeds and tabs from the given <paramref name="text"/>.
+        /// </summary>
+        /// <param name="text">Text to clean</param>
+        /// <returns>Cleaned text</returns>
+        private static string SanitizeText(string text) {
+            char[] buffer = new char[text.Length];
+            int j = 0;
+            for (int i = -1; ++i != text.Length;) {
+                char c = text[i];
+                if (c == SpecChars.TB)
+                    c = SpecChars.WS;
+                
+                if (c == SpecChars.CR) {
+                    // Do look-up
+                    int n = i + 1;
+                    while (n != text.Length && (text[n] == SpecChars.CR || text[n] == SpecChars.NL))
+                        n++;
+
+                    // Insert a single whitespace
+                    buffer[j++] = SpecChars.WS;
+
+                    i = n - 1;
+                    continue;
+                }
+                
+                buffer[j++] = c;
+            }
+            return new string(buffer, 0, j);
         }
     }
 }

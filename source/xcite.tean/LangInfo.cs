@@ -7,7 +7,9 @@ namespace xcite.tean {
 
         /// <summary> German language information </summary>
         public static readonly ILangInfo German = new LangInfo {
-            PuncMarks = new[] {'.', '!', '?'}
+            PuncMarks = new[] {'.', '!', '?', ':'},
+            DateSeparator = '.',
+            TimeSeparator = ':'
         };
 
         /// <summary>
@@ -26,5 +28,11 @@ namespace xcite.tean {
 
         /// <inheritdoc />
         public char[] PuncMarks { get; private set; }
+
+        /// <inheritdoc />
+        public char DateSeparator { get; private set; }
+
+        /// <inheritdoc />
+        public char TimeSeparator { get; private set; }
     }
 }

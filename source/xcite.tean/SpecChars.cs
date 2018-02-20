@@ -5,6 +5,7 @@
         public const char WS = ' ';
         public const char CR = '\r';
         public const char NL = '\n';
+        public const char TB = '\t';
         public const char DT = '.';
         // ReSharper restore InconsistentNaming
     }

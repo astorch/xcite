@@ -98,7 +98,7 @@ namespace xcite.tean.tests {
         }
 
         [Test]
-        public void IterateFull() {
+        public void IterateFull2() {
             // Arrange
             string text = LoadSample("text-sample2.txt");
             
@@ -107,6 +107,18 @@ namespace xcite.tean.tests {
             
             // Assert
             Assert.AreEqual(13, sentences.Length);
+        }
+
+        [Test]
+        public void IterateFullSample3() {
+            // Arrange
+            string text = LoadSample("text-sample3.txt");
+            
+            // Act
+            Sentence[] sentences = text.ToSentences();
+            
+            // Assert
+            Assert.AreEqual(9, sentences.Length);
         }
 
         private string LoadSample(string name) {
