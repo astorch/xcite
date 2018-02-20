@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using NUnit.Framework;
 
@@ -93,9 +92,21 @@ namespace xcite.tean.tests {
             Assert.AreEqual(4, sentences.Length);
 
             Sentence s3 = sentences[2];
-            Assert.AreEqual(141, s3.Begin);
-            Assert.AreEqual(180, s3.End);
+            Assert.AreEqual(140, s3.Begin);
+            Assert.AreEqual(179, s3.End);
             Assert.AreEqual(text.Substring(s3.Begin, s3.Length), s3.Text);
+        }
+
+        [Test]
+        public void IterateFull() {
+            // Arrange
+            string text = LoadSample("text-sample2.txt");
+            
+            // Act
+            Sentence[] sentences = text.ToSentences();
+            
+            // Assert
+            Assert.AreEqual(13, sentences.Length);
         }
 
         private string LoadSample(string name) {
