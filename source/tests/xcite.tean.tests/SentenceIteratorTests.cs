@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using NUnit.Framework;
 
@@ -119,6 +120,30 @@ namespace xcite.tean.tests {
             
             // Assert
             Assert.AreEqual(9, sentences.Length);
+        }
+
+        [Test]
+        public void IterateWithQuotes() {
+            // Arrange
+            string text = "Vielen Dank für Ihre Buchung des \"Freude im Urlaub. Freude im Leben.\"-Pakets.\r\n" +
+                          "Anbei finden Sie die Rechnung zur Ihrer Bestellung.";
+            
+            // Act
+            Sentence[] sentences = text.ToSentences();
+
+            // Assert
+            Assert.AreEqual(2, sentences.Length);
+
+            // Check sentence one
+            Sentence s1 = sentences[0];
+            Assert.AreEqual(text.Substring(s1.Begin, s1.Length), s1.Text);
+            int fInd = text.IndexOf("\r\n", StringComparison.Ordinal);
+            string fText = text.Substring(0, fInd);
+            Assert.AreEqual(fText, s1.Text);
+            
+            // Check sentence two
+            Sentence s2 = sentences[1];
+            Assert.AreEqual(text.Substring(s2.Begin, s2.Length), s2.Text);
         }
 
         private string LoadSample(string name) {

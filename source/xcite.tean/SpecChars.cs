@@ -7,6 +7,8 @@
         public const char NL = '\n';
         public const char TB = '\t';
         public const char DT = '.';
+        public const char SQ = '\'';
+        public const char DQ = '"';
         // ReSharper restore InconsistentNaming
     }
 }

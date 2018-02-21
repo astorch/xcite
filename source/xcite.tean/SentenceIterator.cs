@@ -30,12 +30,19 @@ namespace xcite.tean {
         /// <inheritdoc />
         public bool MoveNext() {
             int i = _p;
-            
+            bool escapeMode = false;
             while (i != _charSet.Length) {
                 char c = _charSet[i];
-                bool isPuncMark = Array.IndexOf(_puncMarks, c) != -1;
 
-                // TODO escape strings
+                // Toggle escape mode
+                if (c == SpecChars.DQ || c == SpecChars.SQ)
+                    escapeMode = !escapeMode;
+                
+                // In escape mode, we have nothing to do
+                if (escapeMode) goto NextRound;
+                
+                // Determine if we have a punctuation mark
+                bool isPuncMark = Array.IndexOf(_puncMarks, c) != -1;
                 
                 // Sentence ends here, if the punc mark does not indiciate a special construction
                 if (isPuncMark && !IsSpecialCon(_charSet, i, _lang)) {
@@ -55,6 +62,7 @@ namespace xcite.tean {
                     return true;
                 }
                 
+                NextRound:
                 i++;
             }
             return false;

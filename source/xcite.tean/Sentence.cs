@@ -5,7 +5,7 @@ namespace xcite.tean {
     /// <summary> Area within a string that can be interpreted as sentence. </summary>
     [DebuggerDisplay("Sentence: {Begin}-{End} Text: '{Text}'")]
     public class Sentence : Span {
-        private string _plainText;
+        private string _unformattedText;
         
         /// <inheritdoc />
         public Sentence(string text, int begin) : base(text, begin) {
@@ -13,7 +13,7 @@ namespace xcite.tean {
         }
 
         /// <summary> <see cref="Span.Text"/> without any linefeeds or tabs. </summary>
-        public string PlainText => _plainText ?? (_plainText = SanitizeText(Text));
+        public string UnformattedText => _unformattedText ?? (_unformattedText = SanitizeText(Text));
 
         /// <summary>
         /// Removes all linefeeds and tabs from the given <paramref name="text"/>.
@@ -34,8 +34,12 @@ namespace xcite.tean {
                     while (n != text.Length && (text[n] == SpecChars.CR || text[n] == SpecChars.NL))
                         n++;
 
-                    // Insert a single whitespace
-                    buffer[j++] = SpecChars.WS;
+                    // If the CR does have a hyphen as predecessor, we don't need a whitespace
+                    bool insertWhitespace = !(i != 0 && text[i - 1] == '-');
+
+                    // Insert a single whitespace instead of the stripped symbols
+                    if (insertWhitespace)
+                        buffer[j++] = SpecChars.WS;
 
                     i = n - 1;
                     continue;
