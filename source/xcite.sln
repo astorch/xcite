@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.messaging", "xcite.me
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.collections", "xcite.collections\xcite.collections.csproj", "{02E88EC9-0823-4C0D-9435-3B5975C00E5D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testsuite", "Testsuite", "{4065A432-A35A-4B3E-A3D4-EC995EED372B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4065A432-A35A-4B3E-A3D4-EC995EED372B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.collections.tests", "tests\xcite.collections.tests\xcite.collections.tests.csproj", "{7363BC18-B477-48C4-AFB2-24D6683F45C2}"
 EndProject

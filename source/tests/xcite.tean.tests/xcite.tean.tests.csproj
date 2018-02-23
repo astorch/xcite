@@ -45,6 +45,7 @@
     <Compile Include="SentenceIteratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SentenceTests.cs" />
+    <Compile Include="WordIteratorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\xcite.tean\xcite.tean.csproj">

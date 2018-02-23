@@ -9,5 +9,8 @@
         
         /// <summary> Time separator mark </summary>
         char TimeSeparator { get; }
+        
+        /// <summary> Word seperator marks </summary>
+        char[] WordSeparator { get; }
     }
 }
