@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace xcite.csharp {
     /// <summary> Provides various extension methods for <see cref="Type"/>. </summary>
-    public static class TypeMethodExtensions {
+    public static class TypeX10N {
         /// <summary>
         /// Returns all public properties of this <paramref name="type"/>. If the given type is 
         /// an interface, the properties of the parent interfaces will be selected, too.
