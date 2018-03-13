@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>C# .NET xcite tean</PackageTags>
-    <PackageReleaseNotes>- Introducing WordIterator</PackageReleaseNotes>
-    <Version>2.1.0</Version>
+    <PackageReleaseNotes>- Using new approach to detect sentences</PackageReleaseNotes>
+    <Version>2.2.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
