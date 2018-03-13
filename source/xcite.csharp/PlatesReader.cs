@@ -55,7 +55,7 @@ namespace xcite.csharp {
                 string textLine = textLines[i];
                 
                 // Ignore comments
-                if (textLine.StartsWith("//")) continue;
+                if (textLine.StartsWith("#")) continue;
                 
                 // Process assignment
                 string[] assign = textLine.Split('=');
