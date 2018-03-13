@@ -25,7 +25,7 @@ namespace xcite.tean.tests {
         }
         
         [Test]
-        public void IterateNoUrl() {
+        public void IterateNoWebTerm() {
             // Arrange
             string text = "Guten Tag Herr Storch,\r\n\r\nvielen Dank für Ihre Mitteilung an AdmiralDirekt.de.";
             
@@ -144,6 +144,28 @@ namespace xcite.tean.tests {
             // Check sentence two
             Sentence s2 = sentences[1];
             Assert.AreEqual(text.Substring(s2.Begin, s2.Length), s2.Text);
+        }
+
+        [Test]
+        public void IterateBadGrammar() {
+            // Arrange
+            string text = "Der Rechnungsbetrag in Höhe von 9,98 EUR wird am 15.03.2018 von Ihrem Konto abgebucht.Ist die hinterlegte Bankverbindung noch aktuell?";
+            
+            // Act
+            Sentence[] sentences = text.ToSentences();
+            
+            // Assert
+            Assert.AreEqual(2, sentences.Length);
+
+            // Check sentence one
+            Sentence s1 = sentences[0];
+            Assert.AreEqual(text.Substring(s1.Begin, s1.Length), s1.Text);
+            Assert.AreEqual("Der Rechnungsbetrag in Höhe von 9,98 EUR wird am 15.03.2018 von Ihrem Konto abgebucht.", s1.Text);
+
+            // Check sentence two
+            Sentence s2 = sentences[1];
+            Assert.AreEqual(text.Substring(s2.Begin, s2.Length), s2.Text);
+            Assert.AreEqual("Ist die hinterlegte Bankverbindung noch aktuell?", s2.Text);
         }
 
         private string LoadSample(string name) {
