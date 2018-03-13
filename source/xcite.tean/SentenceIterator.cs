@@ -48,21 +48,47 @@ namespace xcite.tean {
                 
                 // Determine if we have a punctuation mark
                 bool isPuncMark = Array.IndexOf(_puncMarks, c) != -1;
+
+                if (isPuncMark) {
+                    // Get next valueable character
+                    int nx = i + 1;
+                    _textKit.PlayForward(_charSet, ref nx);
+
+                    // Sentence ends if there is no additional data or the next character is upper case
+                    bool closeSentence;
+                    if (nx == _charSet.Length) {
+                        closeSentence = true;
+                    } else {
+                        char cx = _charSet[nx];
+                        closeSentence = char.IsUpper(cx);
+                    }              
+
+                    // Shift and create sentence
+                    if (closeSentence) {
+                        int end = i + 1;
+                        int length = end - _p;
+                        string text = new string(_charSet, _p, length);
+                        Current = new Sentence(text, _p);
+
+                        _p = nx;
+                        return true;
+                    }
+                }
                 
                 // Sentence ends here, if the punc mark does not indiciate a special construction
-                if (isPuncMark && !_textKit.IsSpecialCon(_charSet, i, _lang)) {
-                    int end = i + 1;
-                    int length = end - _p;
-                    string text = new string(_charSet, _p, length);
-                    Current = new Sentence(text, _p);
-
-                    // Play forward until we reach the next valuable letter
-                    int n = end;
-                    _textKit.PlayForward(_charSet, ref n);
-                    
-                    _p = n;
-                    return true;
-                }
+//                if (isPuncMark && !_textKit.IsSpecialTerm(_charSet, i, _lang)) {
+//                    int end = i + 1;
+//                    int length = end - _p;
+//                    string text = new string(_charSet, _p, length);
+//                    Current = new Sentence(text, _p);
+//
+//                    // Play forward until we reach the next valuable letter
+//                    int n = end;
+//                    _textKit.PlayForward(_charSet, ref n);
+//                    
+//                    _p = n;
+//                    return true;
+//                }
                 
                 NextRound:
                 i++;

@@ -31,7 +31,7 @@ namespace xcite.tean {
         /// <param name="pmIndex">Punctuation mark index</param>
         /// <param name="lang">Language info</param>
         /// <returns>TRUE or FALSE</returns>
-        public bool IsSpecialCon(char[] charSet, int pmIndex, ILangInfo lang) {
+        public bool IsSpecialTerm(char[] charSet, int pmIndex, ILangInfo lang) {
             if (IsUrl(charSet, pmIndex)) return true;
             if (IsDate(charSet, pmIndex, lang.DateSeparator)) return true;
             if (IsTime(charSet, pmIndex, lang.TimeSeparator)) return true;

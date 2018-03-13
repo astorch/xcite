@@ -57,7 +57,7 @@ namespace xcite.tean {
                 bool isWordSeparator = Array.IndexOf(_wordSeparator, c) != -1;
                 
                 // Is this character a word separator? If so, it must not be a special construction (date, URL, ...)
-                if (isWordSeparator && !_textKit.IsSpecialCon(_charSet, i, _lang)) {
+                if (isWordSeparator && !_textKit.IsSpecialTerm(_charSet, i, _lang)) {
                     string wordStr = new string(_buffer, 0, j);
                     Current = new Word(wordStr, _p);
                     
