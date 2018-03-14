@@ -168,6 +168,20 @@ namespace xcite.tean.tests {
             Assert.AreEqual("Ist die hinterlegte Bankverbindung noch aktuell?", s2.Text);
         }
 
+        [Test]
+        public void IterateAbbreviations() {
+            Assert.Inconclusive("Not supported");
+
+            // Arrange
+            string text = "Lieber Herr Müller, ich übersende Ihnen Ihren mtl. Beitrag in i. H. v. 300 EUR.";
+
+            // Act
+            Sentence[] sentences = text.ToSentences();
+
+            // Assert
+            Assert.AreEqual(1, sentences.Length);
+        }
+
         private string LoadSample(string name) {
             Assembly assembly = Assembly.GetExecutingAssembly();
             string fqn = $"{assembly.GetName().Name}.samples.{name}";

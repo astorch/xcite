@@ -79,5 +79,23 @@ namespace xcite.tean.tests {
             Assert.AreEqual(15, words.Length);
             Assert.AreEqual("\"Freude im Urlaub. Freude im Leben.\"-Pakets", words[6].Text);
         }
+
+        [Test]
+        public void IterateMixedIns() {
+            // Arrange
+            string text = "Hr. Müller, bitte überweisen Sie den mtl. Betrag i. H. v. 200 EUR bis zum 31.10.2018 auf das AdmiralDirekt.de Konto.";
+
+            // Act
+            Word[] words = text.ToWords();
+
+            // Assert
+            Assert.AreEqual(20, words.Length);
+
+            string[] expWrdset = {
+                "Hr", "Müller", "bitte", "überweisen", "Sie", "den", "mtl", "Betrag", "i", "H", "v",
+                "200", "EUR", "bis", "zum", "31.10.2018", "auf", "das", "AdmiralDirekt.de", "Konto"
+            };
+            CollectionAssert.AreEqual(expWrdset, words.Select(w => w.Text));
+        }
     }
 }
