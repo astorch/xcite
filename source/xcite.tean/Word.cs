@@ -3,7 +3,7 @@
 namespace xcite.tean {
     /// <inheritdoc />
     /// <summary> Area within a string that can be interpreted as word. </summary>
-    [DebuggerDisplay("Word: {Begin}-{End} '{Text}'")]
+    [DebuggerDisplay("Word: {Begin}-{End} '{Text,nq}'")]
     public class Word : Span {
         
         /// <inheritdoc />

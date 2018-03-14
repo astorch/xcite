@@ -2,7 +2,7 @@
 
 namespace xcite.tean {
     /// <summary> Area within a string that contains specific text. </summary>
-    [DebuggerDisplay("Begin: {Begin} End: {End} Text: {Text}")]
+    [DebuggerDisplay("Begin: {Begin} End: {End} Text: {Text,nq}")]
     public abstract class Span {
         
         /// <summary> Initializes the new instance. </summary>
@@ -15,16 +15,16 @@ namespace xcite.tean {
         }
 
         /// <summary> Text </summary>
-        public string Text { get; }
+        public virtual string Text { get; }
         
         /// <summary> Begin </summary>
-        public int Begin { get; }
+        public virtual int Begin { get; }
         
         /// <summary> End </summary>
-        public int End { get; }
+        public virtual int End { get; }
 
         /// <summary> Length </summary>
-        public int Length
+        public virtual int Length
             => Text.Length;
     }
 }
