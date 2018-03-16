@@ -1,8 +1,8 @@
 PropertyString = Zeichenkettenwert
 
-// Hier wird die Wandlung getestet
+# Hier wird die Wandlung getestet
 PropertyBool = True
 
-// Leerzeilen werden auch ignoriert
+# Leerzeilen werden auch ignoriert
 
 PropertyInt = 65
