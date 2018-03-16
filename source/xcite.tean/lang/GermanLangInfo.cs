@@ -34,8 +34,40 @@ namespace xcite.tean.lang {
 
             // Replace digit only dates
             text = Regex.Replace(text, 
-                "((?<day>[0-9]{1,2})\\.\\s?(?<month>[0-9]{1,2})\\.\\s?(?<year>[0-9]{1,4})?)", 
-                onMatch);
+                "((?<day>[0-9]{1,2})\\.\\s?(?<month>[0-9]{1,2})\\.\\s?(?<year>[0-9]{1,4})?)",
+                match => {
+                    string input = text;
+                    string value = match.Value;
+                    int fst = match.Index;
+                    int lst = fst + value.Length - 1;
+                    char t = input[lst];
+                    bool endedByWs = t == ' ';
+
+                    if (endedByWs)
+                        t = input[--lst];
+
+                    // Default behaviour (standard case)
+                    if (t != '.') return onMatch(match);
+
+                    // Look-ahead
+                    // Get next valueable character
+                    int n = match.Index + match.Length;
+                    while (n != input.Length && !char.IsLetter(input[n])) n++;
+
+                    char c = input[n];
+
+                    // The date is likely(!) within a sentence and not at the end (ISSUE see below)
+                    if (!char.IsUpper(c)) return onMatch(match);
+
+                    string coreValue = input.Substring(fst, lst - fst);
+                    return tokenFactory.Consume(coreValue) + "." + (endedByWs ? " " : string.Empty);
+                });
+
+            /** ISSUE hint
+             * The implemented algorithm is correct for sentence (1), but not for (2).
+             * (1) Bitte überweisen Sie den fälligen Betrag bis zum 28.02. Wir bestätigen Ihnen umgehend den Eingang.
+             * (2) Es gibt lediglich am 28.02. Termine. Bitte suchen Sie sich einen aus.
+             */
 
             return text;
         }
