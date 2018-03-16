@@ -34,5 +34,25 @@ namespace xcite.tean.tests {
             Assert.AreEqual("Wenn der o. g. bis 10:00 Uhr bei uns eingeht, " +
                             "dann erhalten sie einen zusätzl. Rabatt von rd. 2 %.", s3.Text);
         }
+
+        [Test]
+        public void DetectShortDateAtEnd() {
+            // Arrange
+            string text = "Bitte überweisen sie den fälligen Betrag bis zum 28.02. Wir bestätigen Ihnen umgehend den Eingang.";
+
+            // Act
+            Sentence[] sentences = new SentenceDetector(GermanLangInfo.Instance).Detect(text).ToArray();
+
+            // Assert
+            Assert.AreEqual(2, sentences.Length);
+
+            Sentence s1 = sentences[0];
+            Assert.AreEqual(text.Substring(s1.Begin, s1.Length), s1.Text);
+            Assert.AreEqual("Bitte überweisen sie den fälligen Betrag bis zum 28.02.", s1.Text);
+
+            Sentence s2 = sentences[1];
+            Assert.AreEqual(text.Substring(s2.Begin, s2.Length), s2.Text);
+            Assert.AreEqual("Wir bestätigen Ihnen umgehend den Eingang.", s2.Text);
+        }
     }
 }
