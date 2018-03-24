@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>C# .NET xcite tean</PackageTags>
-    <PackageReleaseNotes>- Enhanced German date stripping</PackageReleaseNotes>
-    <Version>2.4.0</Version>
+    <PackageReleaseNotes>- Added german abbreviations</PackageReleaseNotes>
+    <Version>2.5.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
