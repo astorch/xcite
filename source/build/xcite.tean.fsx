@@ -10,6 +10,21 @@ let csproj = "../" + projName + "/"+ projName + ".csproj"
 let buildDir = "../.binaries/"
 let targetDir = buildDir + projName + "/"
 
+// Define targets
+Target "Clean" (fun _ ->
+    CleanDir targetDir
+)
+
+Target "Default" (fun _ -> 
+    DotNetCli.Pack (fun p -> 
+                        { p with 
+                            Configuration = "Release"
+                            OutputPath = targetDir 
+                            Project = csproj 
+                        }
+                   )
+)
+
 // Define dependencies
 "Clean"
     ==> "Default"
