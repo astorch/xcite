@@ -63,7 +63,7 @@ namespace xcite.tean.lang {
                     return tokenFactory.Consume(coreValue) + "." + (endedByWs ? " " : string.Empty);
                 });
 
-            /** ISSUE hint
+            /* ISSUE hint
              * The implemented algorithm is correct for sentence (1), but not for (2).
              * (1) Bitte überweisen Sie den fälligen Betrag bis zum 28.02. Wir bestätigen Ihnen umgehend den Eingang.
              * (2) Es gibt lediglich am 28.02. Termine. Bitte suchen Sie sich einen aus.
@@ -102,6 +102,7 @@ namespace xcite.tean.lang {
             "bzw.", "Bzw.",
             "bzgl.", "Bzgl.",
             "ca.", "Ca.",
+            "co.", "Co.",
             "ders.", "Ders.",
             "dgl.", "Dgl.",
             "dt.", "Dt.",
@@ -142,6 +143,7 @@ namespace xcite.tean.lang {
             "i.H.v.", "i. H. v.",
             "i.d.S.", "i. d. S.",
             "i.E.", "i. E.",
+            "i.L.", "i. L.",
             "i.S.d.", "i. S. d.",
             "i.S.v.", "i. S. v.",
             "i.ü.", "i. ü.", "i.Ü.", "i. Ü.",
