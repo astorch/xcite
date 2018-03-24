@@ -3,6 +3,7 @@ obj
 packages
 tools
 .binaries
+.fake
 .vs
 .idea
 _ReSharper.*/
