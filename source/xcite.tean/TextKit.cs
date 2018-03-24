@@ -12,7 +12,7 @@ namespace xcite.tean {
         }
 
         /// <summary>
-        /// Increments <see cref="n"/> until the given <paramref name="charSet"/> contains
+        /// Increments <paramref name="n"/> cref="n"/> until the given <paramref name="charSet"/> contains
         /// a valuable character at n-th index. A character is valuable if it's not declared
         /// as bias.
         /// </summary>
