@@ -9,13 +9,16 @@
         public SomonProperty(string kind, string id, SomonField[] fields) {
             Kind = kind;
             Id = id;
-            Fields = fields;
+            Fields = fields ?? new SomonField[0];
         }
 
+        /// <summary> Property kind </summary>
         public string Kind { get; }
 
+        /// <summary> (Optional) Property id. </summary>
         public string Id { get; }
         
+        /// <summary> Property fields </summary>
         public SomonField[] Fields { get; }
     }
 }

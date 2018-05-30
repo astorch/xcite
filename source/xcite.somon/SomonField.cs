@@ -9,8 +9,10 @@
             Value = value;
         }
 
+        /// <summary> Field name </summary>
         public string Name { get; }
 
+        /// <summary> Field value </summary>
         public string Value { get; }
     }
 }

@@ -10,6 +10,7 @@
             Properties = properties ?? new SomonProperty[0];
         }
 
+        /// <summary> Object properties </summary>
         public SomonProperty[] Properties { get; }
     }
 }
