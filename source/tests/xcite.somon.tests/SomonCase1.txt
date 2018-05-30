@@ -1,0 +1,16 @@
+region "r1" {
+    bounds 0, 0, 300, 300;
+}
+
+entity "companyName" {
+    regions r1;
+}
+
+fragment {
+
+}
+
+entity "multiple" {
+    regions r1, r2;
+    validtrs none;
+}
