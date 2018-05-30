@@ -7,7 +7,7 @@
     <Company>Arian Storch</Company>
     <Product>xcite collections</Product>
     <Description>Provides various .NET collection extensions</Description>
-    <Copyright>Copyright © 2017</Copyright>
+    <Copyright>© 2017 Arian Storch. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/astorch/xcite</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/astorch/xcite</PackageProjectUrl>
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>

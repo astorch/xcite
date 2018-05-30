@@ -4,7 +4,7 @@
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
     <Description>Provides various c# programming extensions for .NET.</Description>
-    <Copyright>Copyright © 2018</Copyright>
+    <Copyright>© 2017 Arian Storch. All rights reserved.</Copyright>
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <PackageTags>C# .NET xcite csharp</PackageTags>
     <PackageLicenseUrl>https://github.com/astorch/xcite</PackageLicenseUrl>
