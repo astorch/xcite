@@ -22,6 +22,23 @@ namespace xcite.collections {
             }
         }
 
+        /// <summary> Skips the first <paramref name="n"/> items of the sequence. </summary>
+        /// <typeparam name="TItem">Type of items managed by the sequence</typeparam>
+        /// <param name="sequence">Sequence where elements are to be skipped</param>
+        /// <param name="n">Count of elements to skip</param>
+        /// <returns>Sequence without first <paramref name="n"/> elements</returns>
+        public static IEnumerable<TItem> Skip<TItem>(this IEnumerable<TItem> sequence, int n) {
+            if (sequence == null) throw new NullReferenceException();
+
+            int p = -1;
+            using (IEnumerator<TItem> itr = sequence.GetEnumerator()) {
+                while (itr.MoveNext()) {
+                    if (n > ++p) continue;
+                    yield return itr.Current;
+                }
+            }
+        }
+
         /// <summary>
         /// Returns a newly created array that contains all items of the given sequence <paramref name="sequence"/>.
         /// </summary>

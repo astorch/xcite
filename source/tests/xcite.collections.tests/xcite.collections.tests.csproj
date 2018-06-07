@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EnumerableExtensionsBaseTests.cs" />
+    <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="LinearListSortingTests.cs" />
     <Compile Include="ObservableCollectionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
