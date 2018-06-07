@@ -4,14 +4,14 @@ using NUnit.Framework;
 
 namespace xcite.collections.tests {
     [TestFixture]
-    public class EnumerableMxTests {
+    public class EnumerableExtensionsBaseTests {
         [Test]
         public void CountList() {
             // Arrange
-            List<int> list = new List<int>() {1, 2, 3, 5, 12};
+            List<int> list = new List<int> {1, 2, 3, 5, 12};
 
             // Act
-            int count = nogen.EnumerableMx.Count(list);
+            int count = list.Count();
 
             // Assert
             Assert.AreEqual(list.Count, count);
@@ -23,7 +23,7 @@ namespace xcite.collections.tests {
             int[] list = {1, 2, 3, 5, 12};
 
             // Act
-            int count = nogen.EnumerableMx.Count(list);
+            int count = list.Count();
 
             // Assert
             Assert.AreEqual(list.Length, count);
@@ -36,7 +36,7 @@ namespace xcite.collections.tests {
             IEnumerable<int> sequence = list.Where(i => i % 2 == 0);
 
             // Act
-            int count = nogen.EnumerableMx.Count(sequence);
+            int count = sequence.Count();
 
             // Assert
             Assert.AreEqual(2, count);
@@ -51,10 +51,10 @@ namespace xcite.collections.tests {
             IEnumerable<int> seq2 = filledList.Where(i => i % 3 == 0);
 
             // Act
-            bool anyInEmpty = nogen.EnumerableMx.Any(emptyList);
-            bool anyInFilled = nogen.EnumerableMx.Any(filledList);
-            bool anyInSeq1 = nogen.EnumerableMx.Any(seq1);
-            bool anyInSeq2 = nogen.EnumerableMx.Any(seq2);
+            bool anyInEmpty = emptyList.Any();
+            bool anyInFilled = filledList.Any();
+            bool anyInSeq1 = seq1.Any();
+            bool anyInSeq2 = seq2.Any();
 
             // Assert
             Assert.AreEqual(false, anyInEmpty);

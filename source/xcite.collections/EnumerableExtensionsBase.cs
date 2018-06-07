@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace xcite.collections.nogen {
+namespace xcite.collections {
     /// <summary> Implements extension methods for <see cref="IEnumerable"/>. </summary>
-    public static class EnumerableMx {
+    public static class EnumerableExtensionsBase {
 
         /// <summary>
         /// Returns the index of the specified <paramref name="item"/> in the <paramref name="sequence"/>. 
@@ -14,9 +14,8 @@ namespace xcite.collections.nogen {
         /// <param name="sequence">Sequence to process</param>
         /// <param name="item">Item which index to look up</param>
         /// <returns>Index of the item or -1</returns>
-        public static int IndexOf(this IEnumerable sequence, object item) {
-            return IndexOf(sequence, seqItem => Equals(seqItem, item));
-        }
+        public static int IndexOf(this IEnumerable sequence, object item) 
+            => IndexOf(sequence, seqItem => Equals(seqItem, item));
 
         /// <summary>
         /// Returns the index of the first item that matches the specified <paramref name="predicate"/> in the <paramref name="sequence"/>. 
@@ -36,9 +35,7 @@ namespace xcite.collections.nogen {
             });
         }
 
-        /// <summary>
-        /// Returns TRUE if the sequence contains any element.
-        /// </summary>
+        /// <summary> Returns TRUE if the sequence contains any element. </summary>
         /// <param name="sequence">Sequence to proof</param>
         /// <returns>TRUE or FALSE</returns>
         public static bool Any(this IEnumerable sequence) {
@@ -75,6 +72,7 @@ namespace xcite.collections.nogen {
         /// <param name="action">Action to apply to each element</param>
         public static void ForEach(this IEnumerable sequence, Action<object> action) {
             if (sequence == null) throw new NullReferenceException();
+
             sequence.Iterate(itr => {
                 while (itr.MoveNext()) {
                     object item = itr.Current;
@@ -89,9 +87,8 @@ namespace xcite.collections.nogen {
         /// <typeparam name="TItem">Type each element of the sequence is casted to</typeparam>
         /// <param name="sequence">Collection of items</param>
         /// <param name="action">Action to apply to each element</param>
-        public static void ForEach<TItem>(this IEnumerable sequence, Action<TItem> action) {
-            sequence.ForEach(obj => action((TItem) obj));
-        }
+        public static void ForEach<TItem>(this IEnumerable sequence, Action<TItem> action) 
+            => sequence.ForEach(obj => action((TItem) obj));
 
         /// <summary>
         /// Projects each element of a <paramref name="sequence"/> into a form provided by the given <paramref name="selector"/>.
@@ -164,10 +161,8 @@ namespace xcite.collections.nogen {
         /// <param name="sequence">Collection of items</param>
         /// <param name="selector">Transform function</param>
         /// <returns>Collection of transformed items</returns>
-        public static IEnumerable<TResult> Select<TItem, TResult>(this IEnumerable sequence,
-            Func<TItem, TResult> selector) {
-            return sequence.Select<TResult>(obj => selector((TItem) obj));
-        }
+        public static IEnumerable<TResult> Select<TItem, TResult>(this IEnumerable sequence, Func<TItem, TResult> selector) 
+            => sequence.Select(obj => selector((TItem) obj));
 
         /// <summary>
         /// Provides access to the iterator of the specified <paramref name="sequence"/>. 
@@ -176,13 +171,11 @@ namespace xcite.collections.nogen {
         /// </summary>
         /// <param name="sequence">Sequence to iterate</param>
         /// <param name="iterate">Iterator delegate</param>
-        public static void Iterate(this IEnumerable sequence, Action<IEnumerator> iterate) {
-            if (sequence == null) throw new NullReferenceException();
-            sequence.Iterate(itr => {
+        public static void Iterate(this IEnumerable sequence, Action<IEnumerator> iterate)
+            => sequence.Iterate(itr => {
                 iterate(itr);
                 return true;
             });
-        }
 
         /// <summary>
         /// Provides access to the iterator of the specified <paramref name="sequence"/>. 

@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EnumerableMxTests.cs" />
+    <Compile Include="EnumerableExtensionsBaseTests.cs" />
     <Compile Include="LinearListSortingTests.cs" />
     <Compile Include="ObservableCollectionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

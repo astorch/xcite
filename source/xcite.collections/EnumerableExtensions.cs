@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace xcite.collections {
     /// <summary> Provides method extension for <see cref="IEnumerable{T}"/>. </summary>
-    public static class EnumerableExtensionMethods {
+    public static class EnumerableExtensions {
+
         /// <summary>
         /// Applies the given <paramref name="action"/> to each element of the given sequence <paramref name="sequence"/>.
         /// </summary>
@@ -11,6 +12,8 @@ namespace xcite.collections {
         /// <param name="sequence">Collection of items</param>
         /// <param name="action">Action to apply to each element</param>
         public static void ForEach<TItem>(this IEnumerable<TItem> sequence, Action<TItem> action) {
+            if (sequence == null) throw new NullReferenceException();
+
             using (IEnumerator<TItem> itr = sequence.GetEnumerator()) {
                 while (itr.MoveNext()) {
                     TItem item = itr.Current;
@@ -52,9 +55,8 @@ namespace xcite.collections {
         /// <param name="sequence">Sequence to process</param>
         /// <param name="item">Item which index to look up</param>
         /// <returns>Index of the item or -1</returns>
-        public static int IndexOf<TItem>(this IEnumerable<TItem> sequence, TItem item) {
-            return IndexOf(sequence, seqItem => Equals(seqItem, item));
-        }
+        public static int IndexOf<TItem>(this IEnumerable<TItem> sequence, TItem item) 
+            => IndexOf(sequence, seqItem => Equals(seqItem, item));
 
         /// <summary>
         /// Returns the index of the first item that matches the specified <paramref name="predicate"/> in the <paramref name="sequence"/>. 
@@ -68,7 +70,7 @@ namespace xcite.collections {
             if (sequence == null) throw new ArgumentNullException();
 
             int index = -1;
-            using (var itr = sequence.GetEnumerator()) {
+            using (IEnumerator<TItem> itr = sequence.GetEnumerator()) {
                 while (itr.MoveNext()) {
                     index++;
                     if (predicate(itr.Current)) return index;
@@ -76,6 +78,33 @@ namespace xcite.collections {
             }
 
             return -1;
+        }
+
+        /// <summary>
+        /// Selects the item of the given <paramref name="sequence"/> that has the lowest value
+        /// according to the specified <paramref name="selector"/>.
+        /// </summary>
+        /// <typeparam name="TItem">Type of items being managed by the sequence</typeparam>
+        /// <param name="sequence">Sequence to iterate</param>
+        /// <param name="selector">Value selector</param>
+        /// <returns>Item with the lowest value</returns>
+        public static TItem Min<TItem>(this IEnumerable<TItem> sequence, Func<TItem, int> selector) {
+            if (sequence == null) throw new NullReferenceException();
+
+            TItem minItem = default(TItem);
+            int minValue = int.MaxValue;
+            using (IEnumerator<TItem> itr = sequence.GetEnumerator()) {
+                while (itr.MoveNext()) {
+                    TItem item = itr.Current;
+                    int itemValue = selector(item);
+                    if (itemValue >= minValue) continue;
+
+                    minItem = item;
+                    minValue = itemValue;
+                }
+            }
+
+            return minItem;
         }
     }
 }
