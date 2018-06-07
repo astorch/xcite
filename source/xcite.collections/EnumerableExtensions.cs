@@ -6,7 +6,7 @@ namespace xcite.collections {
     public static class EnumerableExtensions {
 
         /// <summary>
-        /// Applies the given <paramref name="action"/> to each element of the given sequence <paramref name="sequence"/>.
+        /// Applies the given <paramref name="action"/> to each element of the given <paramref name="sequence"/>.
         /// </summary>
         /// <typeparam name="TItem">Type of sequence items</typeparam>
         /// <param name="sequence">Collection of items</param>
@@ -18,6 +18,25 @@ namespace xcite.collections {
                 while (itr.MoveNext()) {
                     TItem item = itr.Current;
                     action(item);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the given <paramref name="select"/> action to each element of the given <paramref name="sequence"/>
+        /// and returns the result as new sequence.
+        /// </summary>
+        /// <typeparam name="TItem">Type of sequence items</typeparam>
+        /// <typeparam name="TResult">Type of items in the resulting sequence</typeparam>
+        /// <param name="sequence">Collection to items to process</param>
+        /// <param name="select">Select action</param>
+        /// <returns>New sequence of result items</returns>
+        public static IEnumerable<TResult> ForEach<TItem, TResult>(this IEnumerable<TItem> sequence, Func<TItem, TResult> select) {
+            if (sequence == null) throw new NullReferenceException();
+
+            using (IEnumerator<TItem> itr = sequence.GetEnumerator()) {
+                while (itr.MoveNext()) {
+                    yield return select(itr.Current);
                 }
             }
         }

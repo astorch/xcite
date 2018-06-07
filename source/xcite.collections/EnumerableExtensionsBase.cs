@@ -61,7 +61,7 @@ namespace xcite.collections {
             if (sequence == null) throw new NullReferenceException();
 
             int count = 0;
-            sequence.ForEach(obj => count++);
+            sequence.ForEach(obj => {count++;});
             return count;
         }
 
@@ -97,7 +97,7 @@ namespace xcite.collections {
         /// <param name="sequence">Collection of items</param>
         /// <param name="selector">Transform function</param>
         /// <returns>Collection of transformed items</returns>
-        public static IEnumerable<TResult> Select<TResult>(this IEnumerable sequence, Func<object, TResult> selector) {
+        public static IEnumerable<TResult> ForEach<TResult>(this IEnumerable sequence, Func<object, TResult> selector) {
             if (sequence == null) throw new NullReferenceException();
             IEnumerator itr = sequence.GetEnumerator();
 
@@ -110,6 +110,17 @@ namespace xcite.collections {
                 (itr as IDisposable)?.Dispose();
             }
         }
+
+        /// <summary>
+        /// Projects each strong-typed element a <paramref name="sequence"/> into a form provided by the given <paramref name="selector"/>.
+        /// </summary>
+        /// <typeparam name="TItem">Type each element of the sequence is casted to</typeparam>
+        /// <typeparam name="TResult">Type of object resulting the transform function</typeparam>
+        /// <param name="sequence">Collection of items</param>
+        /// <param name="selector">Transform function</param>
+        /// <returns>Collection of transformed items</returns>
+        public static IEnumerable<TResult> ForEach<TItem, TResult>(this IEnumerable sequence, Func<TItem, TResult> selector)
+            => sequence.ForEach(obj => selector((TItem)obj));
 
         /// <summary>
         /// Returns a newly created array that contains all items of the given sequence <paramref name="sequence"/>.
@@ -152,17 +163,6 @@ namespace xcite.collections {
                 return null;
             });
         }
-
-        /// <summary>
-        /// Projects each strong-typed element a <paramref name="sequence"/> into a form provided by the given <paramref name="selector"/>.
-        /// </summary>
-        /// <typeparam name="TItem">Type each element of the sequence is casted to</typeparam>
-        /// <typeparam name="TResult">Type of object resulting the transform function</typeparam>
-        /// <param name="sequence">Collection of items</param>
-        /// <param name="selector">Transform function</param>
-        /// <returns>Collection of transformed items</returns>
-        public static IEnumerable<TResult> Select<TItem, TResult>(this IEnumerable sequence, Func<TItem, TResult> selector) 
-            => sequence.Select(obj => selector((TItem) obj));
 
         /// <summary>
         /// Provides access to the iterator of the specified <paramref name="sequence"/>. 
