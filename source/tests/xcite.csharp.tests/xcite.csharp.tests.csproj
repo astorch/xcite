@@ -49,6 +49,7 @@
     <Compile Include="ObjectSerializerTests.cs" />
     <Compile Include="PlatesReaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XEnumTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
