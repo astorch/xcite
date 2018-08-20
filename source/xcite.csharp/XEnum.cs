@@ -83,10 +83,11 @@ namespace xcite.csharp {
         /// <param name="enumValue">Resolved enum or default value</param>
         /// <returns>TRUE if an enum value matched</returns>
         public static bool TryParse(string stringValue, out TEnum enumValue) {
-            enumValue = _values[0];
-            for (int i = -1; ++i != _values.Length;) {
+            TEnum[] values = Values;
+            enumValue = values[0];
+            for (int i = -1; ++i != values.Length;) {
                 if (_fields[i].Name != stringValue) continue;
-                enumValue = _values[i];
+                enumValue = values[i];
                 return true;
             }
 
@@ -97,8 +98,9 @@ namespace xcite.csharp {
         /// <param name="enumValue">Reference of the value to read the field name</param>
         /// <returns>Enum field name</returns>
         private static string GetEnumFieldName(TEnum enumValue) {
-            for (int i = -1; ++i != _values.Length;) {
-                if (enumValue != _values[i]) continue;
+            TEnum[] values = Values;
+            for (int i = -1; ++i != values.Length;) {
+                if (enumValue != values[i]) continue;
                 return _fields[i].Name;
             }
 
