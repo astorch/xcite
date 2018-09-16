@@ -21,13 +21,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.tean", "xcite.tean\xc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.tean.tests", "tests\xcite.tean.tests\xcite.tean.tests.csproj", "{BEAA33FF-DDF1-430B-AF38-D58B3B707C39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.nio", "xcite.nio\xcite.nio.csproj", "{BE042F6F-299F-48FF-947B-4B90770FA4AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.nio", "xcite.nio\xcite.nio.csproj", "{BE042F6F-299F-48FF-947B-4B90770FA4AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.nio.tests", "tests\xcite.nio.tests\xcite.nio.tests.csproj", "{22AF8683-06EE-44F9-A058-CA0BBF76C548}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.somon", "xcite.somon\xcite.somon.csproj", "{18EEF960-9369-4C54-8E8C-C77A9218ECFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.somon", "xcite.somon\xcite.somon.csproj", "{18EEF960-9369-4C54-8E8C-C77A9218ECFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.somon.tests", "tests\xcite.somon.tests\xcite.somon.tests.csproj", "{1776B3AA-E9AB-4AFC-9B0E-184EAC2CC464}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.tdn", "xcite.tdn\xcite.tdn.csproj", "{57E1D261-A970-4EF2-B8DA-934B27FA6994}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.tdn.tests", "tests\xcite.tdn.tests\xcite.tdn.tests.csproj", "{BBF32CF5-7BD0-4937-8E30-1232F2C024F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +87,14 @@ Global
 		{1776B3AA-E9AB-4AFC-9B0E-184EAC2CC464}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1776B3AA-E9AB-4AFC-9B0E-184EAC2CC464}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1776B3AA-E9AB-4AFC-9B0E-184EAC2CC464}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57E1D261-A970-4EF2-B8DA-934B27FA6994}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57E1D261-A970-4EF2-B8DA-934B27FA6994}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57E1D261-A970-4EF2-B8DA-934B27FA6994}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57E1D261-A970-4EF2-B8DA-934B27FA6994}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBF32CF5-7BD0-4937-8E30-1232F2C024F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBF32CF5-7BD0-4937-8E30-1232F2C024F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBF32CF5-7BD0-4937-8E30-1232F2C024F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBF32CF5-7BD0-4937-8E30-1232F2C024F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,6 +105,7 @@ Global
 		{BEAA33FF-DDF1-430B-AF38-D58B3B707C39} = {4065A432-A35A-4B3E-A3D4-EC995EED372B}
 		{22AF8683-06EE-44F9-A058-CA0BBF76C548} = {4065A432-A35A-4B3E-A3D4-EC995EED372B}
 		{1776B3AA-E9AB-4AFC-9B0E-184EAC2CC464} = {4065A432-A35A-4B3E-A3D4-EC995EED372B}
+		{BBF32CF5-7BD0-4937-8E30-1232F2C024F1} = {4065A432-A35A-4B3E-A3D4-EC995EED372B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F3458D2D-36D0-47F9-8A00-34AD355C49F9}
