@@ -45,6 +45,43 @@ namespace xcite.logging.tests {
             Assert.IsTrue(streamData.Contains(expLine1));
             Assert.IsTrue(streamData.Contains(expLine2));
         }
+
+        [Test]
+        public void DoNotLogDebugOnInfoLevel() {
+            // Arrange
+            StringBuilderLogStream sbls = new StringBuilderLogStream();
+            LogManager.Configuration
+                .AddStream(sbls)
+                .SetLevel(ELogLevel.Info);
+
+            // Act
+            ILog log = LogManager.GetLog(typeof(LogTests));
+            log.Debug("An invisible entry.");
+            
+            // Assert
+            string streamData = sbls.GetStreamData();
+            Assert.IsEmpty(streamData);
+        }
+
+        [Test]
+        public void DoLogTraceOnDebugLevel() {
+            // Arrange
+            StringBuilderLogStream sbls = new StringBuilderLogStream();
+            LogManager.Configuration
+                .AddStream(sbls)
+                .SetLevel(ELogLevel.Debug);
+
+            // Act
+            ILog log = LogManager.GetLog(typeof(LogTests));
+            log.Trace("A trace record.");
+            string timestamp = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+            string tid = Thread.CurrentThread.ManagedThreadId.ToString();
+
+            // Assert
+            string expVal = $"TRACE {timestamp} [{tid}] LogTests - A trace record.\r\n";
+            string streamData = sbls.GetStreamData();
+            Assert.AreEqual(expVal, streamData);
+        }
         
 
         class StringBuilderLogStream : ILogStream {

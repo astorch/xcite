@@ -14,6 +14,9 @@ namespace xcite.logging {
 
         /// <summary> Writes the given <paramref name="logData"/> to all registered log streams. </summary>
         public void Write(LogData logData) {
+            ELogLevel logLevel = _config.Level;
+            if (!logData.level.IsGreaterOrEqual(logLevel)) return;
+            
             string pattern = _config.Pattern;
             ILogStream[] logStreams = _config.Streams;
             
