@@ -7,7 +7,12 @@ namespace xcite.logging {
     /// <summary> Describes the logging configuration. </summary>
     public class LogConfiguration {
         private readonly List<ILogStream> _logStreams = new List<ILogStream>(10);
-        
+
+        /// <inheritdoc />
+        public LogConfiguration() {
+            Reset();
+        }
+
         /// <summary> Is invoked when the <see cref="Pattern"/> has been changed. </summary>
         public event LogConfigurationChangedHandler PatternChanged;
 
@@ -18,10 +23,10 @@ namespace xcite.logging {
         public event LogConfigurationChangedHandler StreamsChanged;
         
         /// <summary> Log record format pattern </summary>
-        public string Pattern { get; private set; } = LogPatterns.Standard;
+        public string Pattern { get; private set; }
 
         /// <summary> Log record level </summary>
-        public ELogLevel Level { get; private set; } = ELogLevel.Info;
+        public ELogLevel Level { get; private set; }
 
         /// <summary> Log record streams </summary>
         public ILogStream[] Streams 
@@ -53,6 +58,14 @@ namespace xcite.logging {
             
             _logStreams.Add(logStream);
             StreamsChanged?.Invoke(this);
+            return this;
+        }
+
+        /// <summary> Resets the configuration to its default values. </summary>
+        public LogConfiguration Reset() {
+            Pattern = LogPatterns.Standard;
+            Level = ELogLevel.Info;
+            _logStreams.Clear();
             return this;
         }
     }

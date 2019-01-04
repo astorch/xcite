@@ -42,6 +42,7 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="ConfigurationReaderTests.cs" />
         <Compile Include="FileStreamTests.cs" />
         <Compile Include="LogTests.cs" />
         <Compile Include="TextFormatterTests.cs" />
@@ -55,6 +56,11 @@
         <Project>{3ca389b1-ba10-45b9-ad6d-2fc5c116ccbb}</Project>
         <Name>xcite.logging</Name>
       </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="_utlog.cfg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
