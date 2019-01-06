@@ -28,5 +28,19 @@ namespace xcite.logging.tests {
             Assert.AreEqual(typeof(FileStream), fileStream.GetType());
             Assert.AreEqual("_lfc.txt", ((FileStream) fileStream).FileName);
         }
+
+        [Test]
+        public void SetLogManagerConfiguration() {
+            // Arrange
+            string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog.cfg");
+            
+            // Act
+            LogManager.Configuration =  ConfigurationReader.ReadFile(logCfgFn, false);
+            
+            // Assert
+            Assert.AreEqual(ELogLevel.Debug, LogManager.Configuration.Level);
+            Assert.AreEqual("%date %level %text%nl", LogManager.Configuration.Pattern);
+            Assert.AreEqual(2, LogManager.Configuration.Streams.Length);
+        }
     }
 }

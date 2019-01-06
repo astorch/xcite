@@ -6,6 +6,11 @@ using NUnit.Framework;
 namespace xcite.logging.tests {
     [TestFixture]
     public class LogTests {
+        [OneTimeSetUp]
+        public void OneTimeSetUp() {
+            LogManager.Configuration.Reset();
+        }
+        
         [Test]
         public void LogInfo() {
             // Arrange

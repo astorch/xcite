@@ -9,8 +9,10 @@ namespace xcite.logging {
         private static readonly LogOperator _logOperator = new LogOperator(_config, new TextFormatter(), new LogStreamManager());
 
         /// <summary> Log configuration </summary>
-        public static LogConfiguration Configuration 
-            => _config;
+        public static LogConfiguration Configuration {
+            get => _config;
+            set => SetConfiguration(value);
+        }
         
         /// <summary> Creates an instance of <see cref="ILog"/> for the specified <paramref name="type"/>. </summary>
         /// <exception cref="ArgumentNullException">When <paramref name="type"/> is NULL.</exception>
@@ -31,6 +33,20 @@ namespace xcite.logging {
             }
         }
 
+        /// <summary> Applies the specified log <paramref name="config"/>. </summary>
+        private static void SetConfiguration(LogConfiguration config) {
+            if (config == null) return;
+
+            _config.Reset()
+                .SetLevel(config.Level)
+                .SetPattern(config.Pattern);
+
+            ILogStream[] logStreams = config.Streams;
+            for (int i = -1; ++i != logStreams.Length;) {
+                _config.AddStream(logStreams[i]);
+            }
+        }
+        
         /// <summary> Anonymous implementation of <see cref="ILog"/>. </summary>
         class LogImpl : ILog {
             private readonly string _logName;
