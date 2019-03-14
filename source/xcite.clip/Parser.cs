@@ -44,13 +44,20 @@ namespace xcite.clip {
             // See explanation at property
             if (MarvelMode) {
                 string originalCl = Environment.CommandLine;
-                bool quoted = originalCl[0] == dblQuoteTk; // Note, the CLI must NOT start with a double quote character
-                const string execToken = ".exe";
-                int exeIdx = originalCl.IndexOf(execToken, StringComparison.InvariantCultureIgnoreCase);
-                if (exeIdx == -1) return PrintUsageWithError("Unexpected argument format.", optionTypes, null);
 
-                int arglineStart = exeIdx + execToken.Length + (quoted ? 1 : 0);
-                int k = arglineStart;
+                // The first part is always the way the programm has been started, for instance
+                //   (i) "c:\program.exe" ...
+                //  (ii) program.exe ...
+                // (iii) program ...
+                // The first non-whitespace character separates the first part from the rest
+                int k = 0;
+                bool escapeMode = false;
+                char d;
+                while (k != originalCl.Length && ((d = originalCl[k++]) != whitespaceTk || escapeMode)) {
+                    if (d == dblQuoteTk) {
+                        escapeMode = !escapeMode;
+                    }
+                }
 
                 // Find the first non-whitespace character
                 while (k != originalCl.Length && originalCl[k++] == whitespaceTk) {
