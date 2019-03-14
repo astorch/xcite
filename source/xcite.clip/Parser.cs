@@ -35,6 +35,10 @@ namespace xcite.clip {
             if (optionTypes == null || optionTypes.Length == 0) throw new ArgumentNullException(nameof(optionTypes));
             if (args == null || args.Length == 0) return PrintUsageWithError("Missing arguments.", optionTypes, null);
 
+            const char whitespaceTk = ' ';
+            const char dblQuoteTk = '"';
+            const char minusTk = '-';
+
             string argLine;
 
             // See explanation at property
@@ -44,24 +48,27 @@ namespace xcite.clip {
                 int k = 0;
                 while (true) {
                     char c = originalCl[k++];
-                    if (c == '"') {
+                    if (c == dblQuoteTk) {
                         dqc--;
                     }
 
                     if (dqc == 0) break;
                 }
 
-                argLine = originalCl.Substring(k + 1);
+                // Find the first non-whitespace character
+                while (k != originalCl.Length && originalCl[k++] == whitespaceTk) {
+                    // Just go ahead
+                }
+
+                argLine = originalCl.Substring(k - 1);
             } else {
                 argLine = string.Join(" ", args);
             }
 
+            if (string.IsNullOrEmpty(argLine)) return PrintUsageWithError("Missing arguments.", optionTypes, null);
+
             char[] argLineChars = argLine.ToCharArray();
             int maxChars = argLineChars.Length;
-
-            const char whitespaceTk = ' ';
-            const char dblQuoteTk = '"';
-            const char minusTk = '-';
 
             // Modes
             //   (i) No-verb mode starting with -
