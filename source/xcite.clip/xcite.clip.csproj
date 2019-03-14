@@ -1,7 +1,28 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Authors>Arian Storch</Authors>
+    <Company>Arian Storch</Company>
+    <Description>Command Line Interface (CLI) Parser</Description>
+    <Copyright>© 2019 Arian Storch. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/astorch/xcite</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/astorch/xcite</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>c# .NETStandard xcite clip CLI parser</PackageTags>
+    <PackageReleaseNotes>Initial version</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
 </Project>
