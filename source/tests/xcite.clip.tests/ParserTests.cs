@@ -7,6 +7,11 @@ using NUnit.Framework;
 namespace xcite.clip.tests {
     [TestFixture]
     public class ParserTests {
+        [OneTimeSetUp]
+        public void OnSetUp() {
+            Parser.MarvelMode = false;
+        }
+
         [Test]
         public void PrintUsageNoVerb() {
             string usage;
@@ -137,6 +142,15 @@ namespace xcite.clip.tests {
                         Override = false,
                         Name = "localhost",
                         Port = 1010
+                    });
+
+//                yield return new TestCaseData("unpack")
+//                    .Returns(null);
+
+                yield return new TestCaseData("unpack --file \"c:\\\" --dest \"c:\\\" -n localhost")
+                    .Returns(new UnpackOptions {
+                        File = "c:\\", Dest = "c:\\", Name = "localhost",
+                        Port = 9898
                     });
             }
         }

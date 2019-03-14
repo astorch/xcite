@@ -10,6 +10,22 @@ namespace xcite.clip {
     /// <summary> Provides the CLI parser implementation. </summary>
     public static class Parser {
         /// <summary>
+        /// Disable this option to force the parser to take the arguments
+        /// as provided. Otherwise it will take the arguments from the
+        /// original command line invocation. The default value is TRUE.
+        ///
+        /// Explanation:
+        /// If an CLI argument is quoted, for instance a path, and the
+        /// path ends with a backshlash, Windows takes the backslash as
+        /// escape character for the double quote. In this case, the
+        /// arguments get messed up. The marvel mode prevents this behavior
+        /// by self-parsing and splitting the CLI arguments. In this case,
+        /// the args given to <see cref="Run"/> are being ignored.
+        /// By disabling this flag, you can change that behavior.
+        /// </summary>
+        public static bool MarvelMode { get; set; } = true;
+
+        /// <summary>
         /// Parses the given set of <paramref name="args"/> based on the information
         /// of the given <paramref name="optionTypes"/>. If the arguments are valid,
         /// the declared <paramref name="onSuccess"/> method is invoked with the result
@@ -17,9 +33,29 @@ namespace xcite.clip {
         /// </summary>
         public static bool Run(string[] args, Action<string, object> onSuccess, params Type[] optionTypes) {
             if (optionTypes == null || optionTypes.Length == 0) throw new ArgumentNullException(nameof(optionTypes));
-            if (args == null || args.Length == 0) return PrintUsageWithError("Missing arguments", optionTypes, null);
+            if (args == null || args.Length == 0) return PrintUsageWithError("Missing arguments.", optionTypes, null);
 
-            string argLine = string.Join(" ", args);
+            string argLine;
+
+            // See explanation at property
+            if (MarvelMode) {
+                string originalCl = Environment.CommandLine;
+                int dqc = 2;
+                int k = 0;
+                while (true) {
+                    char c = originalCl[k++];
+                    if (c == '"') {
+                        dqc--;
+                    }
+
+                    if (dqc == 0) break;
+                }
+
+                argLine = originalCl.Substring(k + 1);
+            } else {
+                argLine = string.Join(" ", args);
+            }
+
             char[] argLineChars = argLine.ToCharArray();
             int maxChars = argLineChars.Length;
 
@@ -50,11 +86,11 @@ namespace xcite.clip {
             bool verbMode = optionTypes.Length > 1;
 
             // Do we have a verb, but verb mode is no configured?
-            if (verb != null && !verbMode) return PrintUsageWithError($"Verb '{verb}' is not supported", optionTypes, null);
-            if (verb == null && verbMode) return PrintUsageWithError("Verb required", optionTypes, null);
+            if (verb != null && !verbMode) return PrintUsageWithError($"Verb '{verb}' is not supported.", optionTypes, null);
+            if (verb == null && verbMode) return PrintUsageWithError("Verb required.", optionTypes, null);
 
             VerbInfo verbNfo = GetVerb(verb, optionTypes);
-            if (verbNfo == null) return PrintUsageWithError($"Verb '{verb}' is unknown", optionTypes, null);
+            if (verbNfo == null) return PrintUsageWithError($"Verb '{verb}' is unknown.", optionTypes, null);
             
             object verbInstance = verbNfo.GetVerbInstance();
             OptionInfo[] verbOptions = verbNfo.GetOptions();
@@ -69,6 +105,8 @@ namespace xcite.clip {
                     requiredSet.AddLast(option);
             }
 
+            if (offset >= maxChars && requiredSet.Count != 0) return PrintUsageWithError($"Missing required arguments for verb '{verb}'", optionTypes, verbNfo);
+
             char[] buffer = new char[300];
             int p;
             int i = offset;
@@ -79,9 +117,9 @@ namespace xcite.clip {
                 bool shortName = true;
 
                 // Parse the key
-                if (c != minusTk) return PrintUsageWithError($"Invalid syntax", optionTypes, verbNfo);
+                if (c != minusTk) return PrintUsageWithError($"Invalid syntax.", optionTypes, verbNfo);
                 int j = i + 1;
-                if (j == maxChars) return PrintUsageWithError($"Invalid syntax", optionTypes, verbNfo);
+                if (j == maxChars) return PrintUsageWithError($"Invalid syntax.", optionTypes, verbNfo);
                 if (argLineChars[j] == minusTk) {
                     j += 1;
                     shortName = false;
@@ -95,7 +133,7 @@ namespace xcite.clip {
                 }
 
                 string key = new string(buffer, 0, p);
-                if (string.IsNullOrEmpty(key)) return PrintUsageWithError($"Invalid syntax", optionTypes, verbNfo);
+                if (string.IsNullOrEmpty(key)) return PrintUsageWithError($"Invalid syntax.", optionTypes, verbNfo);
 
                 // Get the option info for that key
                 OptionInfo optionNfo = GetOption(verbOptions, key, shortName);
@@ -109,10 +147,10 @@ namespace xcite.clip {
                 }
 
                 // Parse the value
-                if (i == maxChars) return PrintUsageWithError($"Invalid syntax", optionTypes, verbNfo);
+                if (i == maxChars) return PrintUsageWithError($"Invalid syntax.", optionTypes, verbNfo);
 
                 d = argLineChars[i];
-                if (d == minusTk) return PrintUsageWithError($"Invalid syntax", optionTypes, verbNfo);
+                if (d == minusTk) return PrintUsageWithError($"Invalid syntax.", optionTypes, verbNfo);
 
                 bool escapeMode = false;
                 p = 0;
@@ -133,7 +171,7 @@ namespace xcite.clip {
             // All required options must be set
             if (requiredSet.Count != 0) {
                 OptionInfo missReqOpt = requiredSet.First.Value;
-                return PrintUsageWithError($"Missing value for required option '{missReqOpt.GetFullName()}'", optionTypes, verbNfo);
+                return PrintUsageWithError($"Missing value for required option '{missReqOpt.GetFullName()}'.", optionTypes, verbNfo);
             }
 
             onSuccess(verb, verbInstance);
