@@ -243,7 +243,12 @@ namespace xcite.clip {
             }
 
             stream.WriteLine("ARGUMENT(S)");
-            
+
+            // No-verb mode?
+            if (verbNfo == null && optionTypes.Length == 1) {
+                verbNfo = GetVerb(optionTypes[0], null);
+            }
+
             // Print verb information
             if (verbNfo == null) {
                 int maxVerbNameChars = 0;
