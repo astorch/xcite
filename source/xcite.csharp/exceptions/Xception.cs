@@ -6,7 +6,7 @@ namespace xcite.csharp.exceptions {
     /// to simplify exception handling.
     /// </summary>
     /// <typeparam name="TErrorReason">Type of associated error reason</typeparam>
-    public abstract class Xception<TErrorReason> : Exception where TErrorReason : EErrorReason {
+    public abstract class Xception<TErrorReason> : Exception where TErrorReason : EErrorReason<TErrorReason> {
         /// <summary>
         /// Creates a new instance with the given <paramref name="errorReason"/>.
         /// </summary>
@@ -35,12 +35,12 @@ namespace xcite.csharp.exceptions {
         /// <param name="innerException">Preceeding exception</param>
         protected Xception(TErrorReason errorReason, string message, Exception innerException)
             : base(FormatExceptionMessage(errorReason, message ?? errorReason.Hint), innerException) {
-            HResult = (int) (EErrorReason) errorReason;
+            HResult = (int) errorReason;
             ErrorReason = errorReason;
         }
 
         /// <summary> Returns the associated error reason. </summary>
-        public EErrorReason ErrorReason { get; }
+        public TErrorReason ErrorReason { get; }
 
         /// <summary>
         /// Creates an exception message based on the given <paramref name="errorReason"/> and message.
@@ -51,7 +51,7 @@ namespace xcite.csharp.exceptions {
         private static string FormatExceptionMessage(TErrorReason errorReason, string message = null) {
             string tlc = errorReason.TLC;
             string errorMessage = string.Format("{3}-{0} [{1}]: {2}", 
-                (int) (EErrorReason) errorReason, errorReason, message, tlc);
+                ((int) errorReason).ToString(), errorReason, message, tlc);
             return errorMessage;
         }
     }
