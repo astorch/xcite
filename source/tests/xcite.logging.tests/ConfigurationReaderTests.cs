@@ -30,6 +30,31 @@ namespace xcite.logging.tests {
         }
 
         [Test]
+        public void ReadFileWithFlags() {
+            // Arrange
+            string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog2.cfg");
+            
+            // Act
+            LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
+            
+            // Assert
+            Assert.IsNotNull(lgCfg);
+            Assert.AreEqual(ELogLevel.Debug, lgCfg.Level);
+            Assert.AreEqual("%date %level %text%nl", lgCfg.Pattern);
+            
+            Assert.AreEqual(2, lgCfg.Streams.Length);
+            
+            ILogStream consoleStream = lgCfg.Streams[0];
+            Assert.AreEqual(typeof(ConsoleStream), consoleStream.GetType());
+
+            ILogStream fileStream = lgCfg.Streams[1];
+            Assert.AreEqual(typeof(FileStream), fileStream.GetType());
+            Assert.AreEqual("_lfc2.txt", ((FileStream) fileStream).FileName);
+            Assert.AreEqual(true, ((FileStream) fileStream).Append);
+            Assert.AreEqual(ELockingModel.Minimal, ((FileStream) fileStream).LockingModel);
+        }
+
+        [Test]
         public void SetLogManagerConfiguration() {
             // Arrange
             string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog.cfg");
