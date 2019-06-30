@@ -45,8 +45,7 @@ namespace xcite.logging {
                 buffer[p++] = c;
             }
 
-            Array.Resize(ref buffer, p);
-            return new string(buffer);
+            return new string(buffer, 0, p);
         }
 
         /// <summary>
@@ -100,11 +99,8 @@ namespace xcite.logging {
 
             e--;
             
-            Array.Resize(ref argCharSet, l);
-            arg = new string(argCharSet);
-            
-            Array.Resize(ref buffer, p);
-            return new string(buffer);
+            arg = new string(argCharSet, 0, l);
+            return new string(buffer, 0, p);
         }
 
         /// <summary> Signature of a data plotter. </summary>
