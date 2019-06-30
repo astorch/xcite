@@ -51,7 +51,7 @@ namespace xcite.logging.streams {
 
             try {
                 string fullPath = Path.GetFullPath(FileName);
-                _fileStream = File.Create(fullPath);
+                _fileStream = Append ? File.OpenWrite(fullPath) : File.Create(fullPath);
                 return _fileStream;
             } catch (Exception) {
                 return null;
