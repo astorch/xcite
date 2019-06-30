@@ -135,7 +135,12 @@ namespace xcite.logging {
                 string lcStreamProp = logStreamProperty.Name.ToLower();
                 if (lcStreamProp != lcProp) continue;
 
-                object val = Convert.ChangeType(value, logStreamProperty.PropertyType);
+                object val;
+                if (logStreamProperty.PropertyType.IsEnum)
+                    val = Enum.Parse(logStreamProperty.PropertyType, value, true);
+                else
+                    val = Convert.ChangeType(value, logStreamProperty.PropertyType);
+                
                 logStreamProperty.SetValue(logStream, val);
                 return;
             }

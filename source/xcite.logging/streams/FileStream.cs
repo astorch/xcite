@@ -23,6 +23,12 @@ namespace xcite.logging.streams {
 
         /// <summary> Name of the file the stream writes to. </summary>
         public string FileName { get; set; }
+        
+        /// <summary> Flag to determine wheter the file should be appended or overwritten. </summary>
+        public bool Append { get; set; }
+
+        /// <summary> File locking model. Default is <see cref="ELockingModel.Exclusive"/>. </summary>
+        public ELockingModel LockingModel { get; set; } = ELockingModel.Exclusive;
 
         /// <inheritdoc />
         public virtual void Write(string value) {
@@ -33,6 +39,7 @@ namespace xcite.logging.streams {
 
             byte[] data = Encoding.UTF8.GetBytes(value);
             fileStream.Write(data, 0, data.Length);
+            fileStream.Flush();
         }
 
         /// <summary>
