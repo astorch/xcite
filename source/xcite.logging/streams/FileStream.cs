@@ -106,8 +106,10 @@ namespace xcite.logging.streams {
                 => OnLockStream(_fileStream);
 
             /// <summary> Writes the given <paramref name="data"/> to the underlying stream. </summary>
-            public virtual void WriteToStream(byte[] data) 
-                => _fileStream.Write(data, 0, data.Length);
+            public virtual void WriteToStream(byte[] data) {
+                _fileStream.Write(data, 0, data.Length);
+                _fileStream.Flush();
+            }
 
             /// <summary>
             /// Notifies the instance to unlock the file stream so that other
