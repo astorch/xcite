@@ -3,12 +3,25 @@ using System;
 namespace xcite.logging {
     /// <summary> Log level enumeration </summary>
     public class ELogLevel {
+        /// <summary> Flag to set that no message is logged. </summary>
         public static readonly ELogLevel None  = new ELogLevel("NONE", -1);
+        
+        /// <summary> Flag to set that only messages with fatal severity are logged. </summary>
         public static readonly ELogLevel Fatal = new ELogLevel("FATAL", 0);
+        
+        /// <summary> Flag to set that only messages with error severity are logged. </summary>
         public static readonly ELogLevel Error = new ELogLevel("ERROR", 0);
+        
+        /// <summary> Flag to set that only messages with warning severity are logged. </summary>
         public static readonly ELogLevel Warn  = new ELogLevel("WARN", 0);
+        
+        /// <summary> Flag to set that only messages with info severity are logged. </summary>
         public static readonly ELogLevel Info  = new ELogLevel("INFO", 4);
+        
+        /// <summary> Flag to set that only messages with trace severity are logged. </summary>
         public static readonly ELogLevel Trace = new ELogLevel("TRACE", 5);
+        
+        /// <summary> Flag to set that only messages with debug severity are logged. </summary>
         public static readonly ELogLevel Debug = new ELogLevel("DEBUG", 6);
 
         /// <summary> Set of defined enum values. </summary>

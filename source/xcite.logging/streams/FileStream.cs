@@ -48,6 +48,11 @@ namespace xcite.logging.streams {
             }
         }
 
+        /// <summary>
+        /// Returns a stream writer to write to.
+        /// The instance is either newly created or an already existing
+        /// one is returned.
+        /// </summary>
         protected virtual AbstractStreamWriter GetStreamWriter() {
             if (_streamWriter != null) return _streamWriter;
 
