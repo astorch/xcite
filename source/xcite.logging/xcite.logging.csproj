@@ -12,19 +12,17 @@
         <Copyright>© 2018 - 2019 Arian Storch. All rights reserved.</Copyright>
         <PackageProjectUrl>https://github.com/astorch/xcite</PackageProjectUrl>
         <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
-        <Version>1.2.0</Version>
+        <Version>1.3.0</Version>
         <IncludeSource>True</IncludeSource>
         <IncludeSymbols>True</IncludeSymbols>
         <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <DebugSymbols>true</DebugSymbols>
         <DebugType>full</DebugType>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DebugSymbols>true</DebugSymbols>
         <DebugType>embedded</DebugType>
     </PropertyGroup>
 
