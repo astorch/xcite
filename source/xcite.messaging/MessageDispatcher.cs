@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using xcite.collections;
 using xcite.csharp;
 
 namespace xcite.messaging {
@@ -17,8 +17,8 @@ namespace xcite.messaging {
     public class MessageDispatcher : GenericSingleton<MessageDispatcher> {
         private readonly AutoLockStruct<bool> _isAlive = new AutoLockStruct<bool>();
 
-        private readonly AutoLockObject<LinearList<ConsumerEntry>> _registeredConsumers = new AutoLockObject<LinearList<ConsumerEntry>>(new LinearList<ConsumerEntry>());
-        private readonly AutoLockObject<LinearList<EnqueuedEvent>> _eventQueue = new AutoLockObject<LinearList<EnqueuedEvent>>(new LinearList<EnqueuedEvent>());
+        private readonly AutoLockObject<List<ConsumerEntry>> _registeredConsumers = new AutoLockObject<List<ConsumerEntry>>(new List<ConsumerEntry>(100));
+        private readonly AutoLockObject<List<EnqueuedEvent>> _eventQueue = new AutoLockObject<List<EnqueuedEvent>>(new List<EnqueuedEvent>(100));
         private readonly ManualResetEventSlim _processQueueEvent = new ManualResetEventSlim(false);
         private UIThreadDispatcher _uiThreadDispatcher;
 
@@ -39,9 +39,7 @@ namespace xcite.messaging {
             }
         }
 
-        /// <summary>
-        /// Subscribes the given <paramref name="messageConsumer"/> to the dispatcher.
-        /// </summary>
+        /// <summary> Subscribes the given <paramref name="messageConsumer"/> to the dispatcher. </summary>
         /// <param name="messageConsumer">Message consumer</param>
         /// <param name="dataObject">Additional data object that is passed to the consumer each time</param>
         /// <param name="uiThreadDispatch">Requires UI thread dispatching</param>
@@ -51,9 +49,7 @@ namespace xcite.messaging {
             _registeredConsumers.Access(_ => _.Add(new ConsumerEntry(messageConsumer, dataObject, uiThreadDispatch)));
         }
 
-        /// <summary>
-        /// Unsubscribes the given <paramref name="messageConsumer"/> from the dispatcher.
-        /// </summary>
+        /// <summary> Unsubscribes the given <paramref name="messageConsumer"/> from the dispatcher. </summary>
         /// <param name="messageConsumer">Message consumer</param>
         public void Unsubscribe(IMessageConsumer messageConsumer) {
             if (messageConsumer == null) return;
