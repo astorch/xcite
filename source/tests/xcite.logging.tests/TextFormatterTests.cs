@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 using NUnit.Framework;
 
@@ -80,6 +81,31 @@ namespace xcite.logging.tests {
                               $"avg {(sw.ElapsedMilliseconds / (double) itrCount).ToString()}");
             
             Assert.IsTrue(sw.ElapsedMilliseconds < 10);
+        }
+
+        [Test]
+        public void CultureTest() {
+            // Arrange
+            string pattern = LogPatterns.Standard;
+            LogData logData = new LogData {
+                name = "xcite.logging.tests.Almoner",
+                level = ELogLevel.Trace,
+                value = "This is a message"
+            };
+            
+            // Act
+            TextFormatter tf = new TextFormatter();
+            string value1 = tf.FormatValue(pattern, logData);
+            string timestamp = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+            
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-us");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
+
+            string value2 = tf.FormatValue(pattern, logData);
+            
+            // Assert
+            Assert.AreEqual($"TRACE {timestamp} [11] Almoner - This is a message\r\n", value1);
+            Assert.AreEqual(value1, value2);
         }
     }
 }
