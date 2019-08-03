@@ -146,14 +146,64 @@ namespace xcite.logging {
             return simpleName;
         }
 
-        /// <summary> Plots the current timestamp with the specified <paramref name="format"/>. </summary>
-        private static string PlotDate(string format, LogData logData) {
-            return DateTime.Now.ToString(format);
-        }
-
         /// <summary> Plots the current log level. </summary>
         private static string PlotLogLevel(string arg, LogData data) {
             return data.level.ToString();
         }
+
+        /// <summary> Plots the current timestamp with the specified <paramref name="format"/>. </summary>
+        private static string PlotDate(string format, LogData _) {
+            char[] charSet = format.ToCharArray();
+            DateTime dt = DateTime.Now;
+
+            int l = -1;
+            for (int i = -1; ++i != charSet.Length;) {
+                char c = charSet[i];
+                
+                if (_dateTimeFormatters.ContainsKey(c)) {
+                    if (l == -1) {
+                        l = i;
+                    }
+                    continue;
+                }
+
+                if (l != -1) {
+                    ReplaceTokenAtIndex(charSet, i, l, dt);
+                    l = -1;
+                }
+            }
+
+            if (l != -1) {
+                ReplaceTokenAtIndex(charSet, charSet.Length, l, dt);
+            }
+            
+            return new string(charSet);
+        }
+
+        /// <summary>
+        /// Replaces a DateTime pattern expression starting at the given index <paramref name="l"/>
+        /// with the corresponding value from referenced <paramref name="dateTime"/> when the expression
+        /// is supported. In that case, all tokens between <paramref name="i"/> and <paramref name="l"/>
+        /// are replaced. Note, this method operates in-situ and modifies the given <paramref name="charSet"/>
+        /// directly.
+        /// </summary>
+        private static void ReplaceTokenAtIndex(char[] charSet, int i, int l, DateTime dateTime) {
+            char token = charSet[l];
+            if (!_dateTimeFormatters.TryGetValue(token, out PartSelector formatter)) return;
+            
+            int tokenLength = i - l;
+            string value = formatter(dateTime);
+            char[] fbuf = value.ToCharArray(value.Length - tokenLength, tokenLength);
+            Array.Copy(fbuf, 0, charSet, l, tokenLength);
+        }
+        
+        private delegate string PartSelector(DateTime dt);
+        
+        private static readonly Dictionary<char, PartSelector> _dateTimeFormatters = new Dictionary<char, PartSelector>(50) {
+            {'y', dt => dt.Year.ToString("0000")}, {'M', dt => dt.Month.ToString("00")}, {'d', dt => dt.Day.ToString("00")},
+            {'h', dt => (dt.Hour % 12).ToString("00")}, {'H', dt => dt.Hour.ToString("00")}, {'m', dt => dt.Minute.ToString("00")}, {'s', dt => dt.Second.ToString("00")}, 
+            {'f', dt => dt.Millisecond.ToString("0000")}, {'F', dt => dt.Millisecond.ToString("####")},
+            {'t', dt => dt.Hour > 12 ? "PM" : "AM"}, {'z', dt => (dt.ToUniversalTime() - dt).Hours.ToString("00")}
+        };
     }
 }
