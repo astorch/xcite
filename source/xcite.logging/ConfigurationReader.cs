@@ -27,6 +27,7 @@ namespace xcite.logging {
             
                 string simpleFileName = Path.GetFileName(fullPath);
 
+                // ReSharper disable once InconsistentNaming
                 void updateLogConfiguration(object sender, FileSystemEventArgs e) {
                     OnFileChanged(logConfig, e);
                 }
@@ -69,7 +70,7 @@ namespace xcite.logging {
 
                 char[] bias = {' ', '\t', '\r'};
                 string key = linePair[0]?.Trim(bias).ToLower();
-                string value = linePair[1]?.Trim(bias).ToLower();
+                string value = linePair[1]?.Trim(bias);
                 
                 if (key == null) continue;
                 if (value == null) continue;
