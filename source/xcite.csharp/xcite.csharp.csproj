@@ -4,8 +4,8 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <Authors>Arian Storch</Authors>
     <Company>Arian Storch</Company>
-    <Description>Provides various c# programming extensions for .NET.</Description>
-    <Copyright>© 2017 Arian Storch. All rights reserved.</Copyright>
+    <Description>Provides various C# programming extensions for .NET.</Description>
+    <Copyright>© 2017 - 2019 Arian Storch. All rights reserved.</Copyright>
     <RepositoryUrl>https://github.com/astorch/xcite</RepositoryUrl>
     <PackageTags>C# .NET xcite csharp</PackageTags>
     <PackageLicenseUrl>https://github.com/astorch/xcite</PackageLicenseUrl>
@@ -14,17 +14,17 @@
     <RepositoryType>GIT</RepositoryType>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <Version>7.0.3</Version>  
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Version>7.1.0</Version>
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>full</DebugType>    
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>embedded</DebugType>
   </PropertyGroup>
+  
 </Project>
