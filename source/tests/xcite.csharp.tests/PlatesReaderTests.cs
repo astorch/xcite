@@ -22,6 +22,7 @@ namespace xcite.csharp.tests {
             Assert.AreEqual("Zeichenkettenwert", cfg.PropertyString);
             Assert.AreEqual(true, cfg.PropertyBool);
             Assert.AreEqual(65, cfg.PropertyInt);
+            Assert.AreEqual(TestConfiguration.EPropertyEnum.One, cfg.PropertyEnum);
         }
 
     }
@@ -33,5 +34,13 @@ namespace xcite.csharp.tests {
         public bool PropertyBool { get; set; }
 
         public int PropertyInt { get; set; }
+
+        public EPropertyEnum PropertyEnum { get; set; }
+        
+        public enum EPropertyEnum {
+            None,
+            One,
+            Two
+        }
     }
 }

@@ -6,3 +6,6 @@ PropertyBool = True
 # Leerzeilen werden auch ignoriert
 
 PropertyInt = 65
+
+# Enum value (lower case written)
+PropertyEnum = one
