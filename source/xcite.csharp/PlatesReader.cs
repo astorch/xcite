@@ -71,7 +71,11 @@ namespace xcite.csharp {
                 // Path couldn't be resolved
                 if (property == null) throw new InvalidOperationException($"Could not resolve path '{key}' for the given object '{typeof(TObject)}'.");
 
-                object clrValue = Convert.ChangeType(value, property.PropertyType);
+                object clrValue = property.PropertyType.IsEnum
+                        ? ToClrEnumValue(property, value)
+                        : Convert.ChangeType(value, property.PropertyType)
+                    ;
+                
                 property.SetValue(obj, clrValue);
             }
 
@@ -104,6 +108,27 @@ namespace xcite.csharp {
                 name = subPath;
                 properties = subProperties;
             }
+        }
+
+        /// <summary>
+        /// Converts the given string <paramref name="value"/> into the corresponding
+        /// CLR enum value that is expected by the given <paramref name="property"/>.
+        /// If no matching enum value is found, the default type-specific
+        /// enumeration value is returned. 
+        /// </summary>
+        private object ToClrEnumValue(PropertyInfo property, string value) {
+            Type enumType = property.PropertyType;
+            string[] enumValueNames = Enum.GetNames(enumType);
+
+            for (int i = -1; ++i != enumValueNames.Length;) {
+                string enumValueName = enumValueNames[i];
+                if (!string.Equals(enumValueName, value, StringComparison.InvariantCultureIgnoreCase)) continue;
+
+                return Enum.GetValues(enumType).GetValue(i);
+            }
+
+            // Return default value
+            return Activator.CreateInstance(enumType);
         }
 
         /// <summary>
