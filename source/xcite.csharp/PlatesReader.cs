@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace xcite.csharp {
     /// <summary> Reads configuration settings written in plain text format (PLAin TExt Settings).
@@ -71,11 +73,18 @@ namespace xcite.csharp {
                 // Path couldn't be resolved
                 if (property == null) throw new InvalidOperationException($"Could not resolve path '{key}' for the given object '{typeof(TObject)}'.");
 
-                object clrValue = property.PropertyType.IsEnum
-                        ? ToClrEnumValue(property, value)
-                        : Convert.ChangeType(value, property.PropertyType)
-                    ;
-                
+                bool isNullable = Nullable.GetUnderlyingType(property.PropertyType) != null;
+                bool isEnum = property.PropertyType.IsEnum;
+
+                object clrValue;
+                if (isNullable) {
+                    clrValue = ToNullableValue(property, value);
+                } else if (isEnum) {
+                    clrValue = ToClrEnumValue(property, value);
+                } else {
+                    clrValue = ToTargetType(property.PropertyType, value);
+                }
+
                 property.SetValue(obj, clrValue);
             }
 
@@ -112,6 +121,20 @@ namespace xcite.csharp {
 
         /// <summary>
         /// Converts the given string <paramref name="value"/> into the corresponding
+        /// nullable value that is expected by the given <paramref name="property"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">If the property type is not nullable</exception>
+        private object ToNullableValue(PropertyInfo property, string value) {
+            if (string.IsNullOrEmpty(value)) return null;
+
+            Type nullableType = Nullable.GetUnderlyingType(property.PropertyType);
+            if (nullableType == null) throw new InvalidOperationException("Cannot convert non-nullable to nullable");
+
+            return ToTargetType(nullableType, value);
+        }
+        
+        /// <summary>
+        /// Converts the given string <paramref name="value"/> into the corresponding
         /// CLR enum value that is expected by the given <paramref name="property"/>.
         /// If no matching enum value is found, the default type-specific
         /// enumeration value is returned. 
@@ -129,6 +152,16 @@ namespace xcite.csharp {
 
             // Return default value
             return Activator.CreateInstance(enumType);
+        }
+
+        /// <summary>
+        /// Converts the given <paramref name="value"/> into the specified <paramref name="type"/>
+        /// via <see cref="Convert.ChangeType(object,System.Type,IFormatProvider)"/>. <see cref="CultureInfo.InvariantCulture"/>
+        /// is used as format provider.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private object ToTargetType(Type type, object value) {
+            return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
