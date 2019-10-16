@@ -91,7 +91,11 @@ namespace xcite.logging.tests {
 
         class StringBuilderLogStream : ILogStream {
             private readonly StringBuilder _stringBuilder = new StringBuilder(1000);
-            
+
+            public void Dispose() {
+                // Nothing to do here
+            }
+
             public void Write(string value) {
                 _stringBuilder.Append(value);
             }
