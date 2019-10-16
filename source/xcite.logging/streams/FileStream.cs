@@ -7,7 +7,7 @@ namespace xcite.logging.streams {
     /// Implements <see cref="ILogStream"/> that writes into a specified file. Note, the file stream remains
     /// as long open as the file stream instance exists. 
     /// </summary>
-    public class FileStream : ILogStream, IDisposable {
+    public class FileStream : ILogStream {
         private AbstractStreamWriter _streamWriter;
 
         /// <inheritdoc />
@@ -16,7 +16,7 @@ namespace xcite.logging.streams {
         }
 
         /// <inheritdoc />
-        public void Dispose() {
+        public virtual void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
