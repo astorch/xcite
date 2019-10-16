@@ -92,5 +92,25 @@ namespace xcite.logging.tests {
             Assert.AreEqual("%date %level %text%nl", LogManager.Configuration.Pattern);
             Assert.AreEqual(2, LogManager.Configuration.Streams.Length);
         }
+
+        [Test]
+        public void ApplyConfigurationFileTwice() {
+            // Arrange
+            string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog.cfg");
+            LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
+            LogManager.Configuration = lgCfg;
+            
+            // Act
+            ILog log1 = LogManager.GetLog("UTUnit");
+            log1.Info("Initialized");
+
+            LogConfiguration lgCfg2 = ConfigurationReader.ReadFile(logCfgFn, false);
+            LogManager.Configuration = lgCfg2;
+
+            ILog log2 = LogManager.GetLog("UTUnit2");
+            log2.Info("Re-initialized");
+            
+            // Assert
+        }
     }
 }
