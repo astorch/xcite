@@ -3,8 +3,12 @@ namespace xcite.logging.streams {
     /// <seealso cref="System.Diagnostics.Debug"/>
     public class DebugStream : ILogStream {
         /// <inheritdoc />
-        public virtual void Write(string value) {
-            System.Diagnostics.Debug.Write(value);
+        public virtual void Dispose() {
+            // Nothing to do here
         }
+
+        /// <inheritdoc />
+        public virtual void Write(string value) 
+            => System.Diagnostics.Debug.Write(value);
     }
 }
