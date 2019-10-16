@@ -7,7 +7,7 @@ namespace xcite.logging.streams {
     /// Implements <see cref="ILogStream"/> that writes into a specified file. Note, the file stream remains
     /// as long open as the file stream instance exists. 
     /// </summary>
-    public class FileStream : ILogStream {
+    public class FileStream : ILogStream, FileStream._Bender {
         private AbstractStreamWriter _streamWriter;
 
         /// <inheritdoc />
@@ -29,6 +29,9 @@ namespace xcite.logging.streams {
 
         /// <summary> File locking model. Default is <see cref="ELockingModel.Exclusive"/>. </summary>
         public ELockingModel LockingModel { get; set; } = ELockingModel.None;
+        
+        /// <summary> Flag to determine to create one log file per day. </summary>
+        public bool DailyRolling { get; set; }
 
         /// <inheritdoc />
         public virtual void Write(string value) {
@@ -54,6 +57,10 @@ namespace xcite.logging.streams {
         /// one is returned.
         /// </summary>
         protected virtual AbstractStreamWriter GetStreamWriter() {
+            if (DailyRolling) {
+                _streamWriter = UpdateFileStream(_streamWriter);
+            }
+            
             if (_streamWriter != null) return _streamWriter;
 
             if (LockingModel == ELockingModel.Exclusive)
@@ -65,6 +72,44 @@ namespace xcite.logging.streams {
             
             _streamWriter.InitStream(FileName, Append);
             return _streamWriter;
+        }
+
+        /// <summary>
+        /// Returns an updated file stream when last write date of the <paramref name="currentStream"/>
+        /// has another day than today. In this case, the <paramref name="currentStream"/> is closed
+        /// and its file is renamed. Finally, NULL is returned.
+        /// When the <paramref name="currentStream"/> does not require an update, it is returned
+        /// unmodified.
+        /// </summary>
+        protected virtual AbstractStreamWriter UpdateFileStream(AbstractStreamWriter currentStream) {
+            // No stream, nothing to check
+            if (currentStream == null) return null;
+
+            // When nothing has been written to the stream yet, there is nothing to check
+            if (currentStream._lastWrite == default) return currentStream;
+
+            // When the day hasn't changed yet, there is nothing to do
+            if (currentStream._lastWrite.Day == DateTime.Today.Day) return currentStream;
+            
+            // Close stream
+            DateTime lastWriteDay = currentStream._lastWrite;
+            currentStream.Dispose();
+            
+            // Calculate new file name
+            string year = lastWriteDay.Year.ToString();
+            string month = lastWriteDay.Month.ToString("00");
+            string day = lastWriteDay.Day.ToString("00");
+
+            int extIdx = FileName.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase);
+            string fnm = FileName.Substring(0, extIdx);
+            string ext = FileName.Substring(extIdx);
+            string mvFn = $"{fnm}-{year}-{month}-{day}{ext}";
+            
+            // Renamed existing file
+            File.Move(FileName, mvFn);
+            
+            // Drop existing file stream
+            return null;
         }
 
         /// <summary>
@@ -82,10 +127,17 @@ namespace xcite.logging.streams {
             _streamWriter = null;
         }
 
+        /// <inheritdoc />
+        void _Bender.SetLastWrite(DateTime value) {
+            if (_streamWriter == null) return;
+            _streamWriter._lastWrite = value;
+        }
+
         /// <summary> Defines a locking model aware file stream writer.
         /// </summary>
         protected abstract class AbstractStreamWriter : IDisposable {
             private System.IO.FileStream _fileStream;
+            public DateTime _lastWrite;
             
             /// <summary>
             /// Initializes a file stream with the specified <paramref name="fileName"/>.
@@ -109,6 +161,7 @@ namespace xcite.logging.streams {
             public virtual void WriteToStream(byte[] data) {
                 _fileStream.Write(data, 0, data.Length);
                 _fileStream.Flush();
+                _lastWrite = DateTime.Today;
             }
 
             /// <summary>
@@ -207,6 +260,13 @@ namespace xcite.logging.streams {
             protected override void OnUnlockStream(System.IO.FileStream fileStream) {
                 // No additional unlock required
             }
+        }
+        
+        /// <summary> Interface for internal usage </summary>
+        // ReSharper disable once InconsistentNaming
+        public interface _Bender {
+            /// <summary> Sets the last write instant to the given <paramref name="value"/>. </summary>
+            void SetLastWrite(DateTime value);
         }
     }
 }
