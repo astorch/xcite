@@ -65,6 +65,10 @@ namespace xcite.logging {
         public LogConfiguration Reset() {
             Pattern = LogPatterns.Standard;
             Level = ELogLevel.Info;
+            
+            for (int i = -1; ++i != _logStreams.Count;)
+                _logStreams[i].Dispose();
+            
             _logStreams.Clear();
             return this;
         }
