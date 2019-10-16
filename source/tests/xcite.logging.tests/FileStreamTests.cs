@@ -61,5 +61,32 @@ namespace xcite.logging.tests {
             string yesterdayFileText = File.ReadAllText(logFileYesterday);
             Assert.AreEqual(logTextYesterday, yesterdayFileText);
         }
+
+        [Test]
+        public void WriteToFolderPath() {
+            // Arrange
+            string recordText = "Some record";
+            string logFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "logs", "_log.txt");
+            FileInfo fileNfo = new FileInfo(logFilePath);
+            if (fileNfo.Exists) {
+                DirectoryInfo fileFolder = fileNfo.Directory;
+                fileNfo.Delete();
+                fileFolder?.Delete(true);
+            }
+
+            FileStream fileStream = new FileStream {FileName = logFilePath};
+            
+            // Act
+            using (fileStream) {
+                fileStream.Write(recordText);
+            }
+            
+            // Assert
+            fileNfo.Refresh();
+            Assert.IsTrue(fileNfo.Exists);
+            Assert.IsTrue(fileNfo.Directory?.Exists);
+            
+            Assert.AreEqual(recordText, File.ReadAllText(logFilePath));
+        }
     }
 }
