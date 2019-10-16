@@ -9,3 +9,10 @@ PropertyInt = 65
 
 # Enum value (lower case written)
 PropertyEnum = one
+
+# Nullable int
+PropertyNullableInt1 = 
+PropertyNullableInt2 = 5
+
+# Nullable double
+PropertyNullableDouble = 5.24
