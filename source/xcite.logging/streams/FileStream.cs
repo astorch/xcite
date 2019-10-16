@@ -69,6 +69,11 @@ namespace xcite.logging.streams {
                 _streamWriter = new MinimalLockingStreamWriter();
             else
                 _streamWriter = new NonLockingStreamWriter();
+
+            string fqFilePath = Path.GetFullPath(FileName);
+            string fqFolderPath = Path.GetDirectoryName(fqFilePath);
+            if (!string.IsNullOrEmpty(fqFolderPath) && !Directory.Exists(fqFolderPath))
+                Directory.CreateDirectory(fqFolderPath);
             
             _streamWriter.InitStream(FileName, Append);
             return _streamWriter;
@@ -173,7 +178,7 @@ namespace xcite.logging.streams {
 
             /// <inheritdoc />
             public virtual void Dispose() {
-                _fileStream.Dispose();
+                _fileStream?.Dispose();
                 _fileStream = null;
             }
 
