@@ -10,12 +10,16 @@ namespace xcite.logging.tests {
         public void Write() {
             // Arrange
             string logFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "_log.txt");
+            if (File.Exists(logFilePath))
+                File.Delete(logFilePath);
+
             string logText = "INFO 30.12.2018 19:44:51 FileStreamTests - Something about logging.\r\n";
             FileStream fileStream = new FileStream {FileName = logFilePath};
 
             // Act
-            fileStream.Write(logText);
-            fileStream.Dispose();
+            using (fileStream) {
+                fileStream.Write(logText);    
+            }
 
             // Assert
             string fileText = File.ReadAllText(logFilePath);
@@ -87,6 +91,62 @@ namespace xcite.logging.tests {
             Assert.IsTrue(fileNfo.Directory?.Exists);
             
             Assert.AreEqual(recordText, File.ReadAllText(logFilePath));
+        }
+
+        [Test]
+        public void WriteAppended() {
+           // Arrange
+           string baseText = "This is the first line\n";
+           string recordText = "This is the recorded line.";
+           string logFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "fileToAppend.txt");
+           if (File.Exists(logFile))
+               File.Delete(logFile);
+           
+           File.WriteAllText(logFile, baseText);
+
+           // Act
+           FileStream fileStream = new FileStream {FileName = logFile, Append = true};
+           using (fileStream) {
+               fileStream.Write(recordText);
+           }
+
+           // Assert
+           Assert.IsTrue(File.Exists(logFile));
+
+           string logFileText = File.ReadAllText(logFile);
+           Assert.IsNotEmpty(logFileText);
+           Assert.AreEqual(
+               baseText + recordText,
+               logFileText
+           );
+        }
+
+        [Test]
+        public void WriteNotAppended() {
+            // Arrange
+            string baseText = "This is the first line\n";
+            string recordText = "This is the recorded line.";
+            string logFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "fileToAppend.txt");
+            if (File.Exists(logFile))
+                File.Delete(logFile);
+           
+            File.WriteAllText(logFile, baseText);
+
+            // Act
+            FileStream fileStream = new FileStream {FileName = logFile, Append = false};
+            using (fileStream) {
+                fileStream.Write(recordText);
+            }
+
+            // Assert
+            Assert.IsTrue(File.Exists(logFile));
+
+            string logFileText = File.ReadAllText(logFile);
+            Assert.IsNotEmpty(logFileText);
+            Assert.AreEqual(
+                recordText,
+                logFileText
+            );
         }
     }
 }
