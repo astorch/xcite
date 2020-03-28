@@ -23,9 +23,12 @@ namespace xcite.logging.streams {
 
         /// <summary> Name of the file the stream writes to. </summary>
         public string FileName { get; set; }
-        
-        /// <summary> Flag to determine wheter the file should be appended or overwritten. </summary>
-        public bool Append { get; set; }
+
+        /// <summary>
+        /// Flag to determine wheter the file should be appended or overwritten.
+        /// Default is TRUE.
+        /// </summary>
+        public bool Append { get; set; } = true;
 
         /// <summary> File locking model. Default is <see cref="ELockingModel.Exclusive"/>. </summary>
         public ELockingModel LockingModel { get; set; } = ELockingModel.None;
@@ -35,9 +38,8 @@ namespace xcite.logging.streams {
 
         /// <inheritdoc />
         public virtual void Write(string value) {
-            if (string.IsNullOrEmpty(FileName)) return;
-            if (string.IsNullOrEmpty(value)) return;
-
+            if (string.IsNullOrEmpty(FileName) || string.IsNullOrEmpty(value)) return;
+            
             AbstractStreamWriter streamWriter = GetStreamWriter();
             if (streamWriter == null) return;
             
@@ -153,6 +155,7 @@ namespace xcite.logging.streams {
             public virtual void InitStream(string fileName, bool append) {
                 FileMode fileMode = append ? FileMode.OpenOrCreate : FileMode.Create;
                 _fileStream = OnInitStream(fileName, fileMode);
+                _fileStream.Seek(0, SeekOrigin.End);
             }
 
             /// <summary>
