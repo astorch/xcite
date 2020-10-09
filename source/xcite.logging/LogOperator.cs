@@ -23,16 +23,16 @@ namespace xcite.logging {
             string record = _textFormatter.FormatValue(pattern, logData);
             _streamManager.Write(logStreams, logData.name, logData.level, record);
 
-            if (logData.exception != null) {
-                LogData exLgDt = new LogData {
-                    name = logData.name, level = logData.level,
-                    value = logData.exception.ToString(),
-                    exception = logData.exception
-                };
+            if (logData.exception == null) return;
+            
+            LogData exLgDt = new LogData {
+                name = logData.name, level = logData.level,
+                value = logData.exception.ToString(),
+                exception = logData.exception
+            };
 
-                string exRec = _textFormatter.FormatValue(pattern, exLgDt);
-                _streamManager.Write(logStreams, exLgDt.name, exLgDt.level, exRec);
-            }
+            string exRec = _textFormatter.FormatValue(pattern, exLgDt);
+            _streamManager.Write(logStreams, exLgDt.name, exLgDt.level, exRec);
         }
     }
 }
