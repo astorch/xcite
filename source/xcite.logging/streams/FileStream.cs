@@ -25,7 +25,7 @@ namespace xcite.logging.streams {
         public string FileName { get; set; }
 
         /// <summary>
-        /// Flag to determine wheter the file should be appended or overwritten.
+        /// Flag to determine whether the file should be appended or overwritten.
         /// Default is TRUE.
         /// </summary>
         public bool Append { get; set; } = true;
