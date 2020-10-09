@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
+using xcite.logging.streams;
 
 namespace xcite.logging.tests {
     [TestFixture]
@@ -87,16 +88,62 @@ namespace xcite.logging.tests {
             string streamData = sbls.GetStreamData();
             Assert.AreEqual(expVal, streamData);
         }
-        
 
-        class StringBuilderLogStream : ILogStream {
+        [Test]
+        public void DoNotLogIfWrongType() {
+            // Arrange
+            FilteredStream fooStream = new FilteredStream {
+                Types = new[] { "FooType" }
+            };
+            FilteredStream barStream = new FilteredStream {
+                Types = new[] { "BarType" }
+            };
+            LogManager.Configuration
+                .AddStream(fooStream)
+                .AddStream(barStream)
+                .SetLevel(ELogLevel.Debug);
+
+            // Act
+            ILog fooLog = LogManager.GetLog("FooType");
+            ILog barLog = LogManager.GetLog("BarType");
+            fooLog.Trace("foo");
+            barLog.Trace("bar");
+            string timestamp = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+            string tid = Thread.CurrentThread.ManagedThreadId.ToString();
+
+            // Assert
+            string expFooVal = $"TRACE {timestamp} [{tid}] FooType - foo\r\n";
+            string expBarVal = $"TRACE {timestamp} [{tid}] BarType - bar\r\n";
+            string fooStreamData = fooStream.GetStreamData();
+            string barStreamData = barStream.GetStreamData();
+            Assert.AreEqual(expFooVal, fooStreamData);
+            Assert.AreEqual(expBarVal, barStreamData);
+        }
+
+        private class StringBuilderLogStream : AbstractStream {
             private readonly StringBuilder _stringBuilder = new StringBuilder(1000);
 
-            public void Dispose() {
+            public override void Dispose() {
                 // Nothing to do here
             }
 
-            public void Write(string value, string logName) {
+            public override void Write(string value) {
+                _stringBuilder.Append(value);
+            }
+
+            public string GetStreamData() {
+                return _stringBuilder.ToString();
+            }
+        }
+
+        private class FilteredStream : AbstractStream {
+            private readonly StringBuilder _stringBuilder = new StringBuilder(1000);
+
+            public override void Dispose() {
+                // Nothing to do here
+            }
+
+            public override void Write(string value) {
                 _stringBuilder.Append(value);
             }
 
