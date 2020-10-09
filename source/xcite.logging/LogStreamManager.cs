@@ -10,7 +10,7 @@ namespace xcite.logging {
         public void Write(ILogStream[] logStreams, string logName, ELogLevel logLevel, string value) {
             lock (_accessToken) {
                 for (int i = -1; ++i != logStreams.Length;)
-                    logStreams[i].Write(value);
+                    logStreams[i].Write(value, logName);
             }
         }
     }

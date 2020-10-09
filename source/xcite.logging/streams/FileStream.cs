@@ -4,10 +4,10 @@ using System.Text;
 
 namespace xcite.logging.streams {
     /// <summary>
-    /// Implements <see cref="ILogStream"/> that writes into a specified file. Note, the file stream remains
+    /// Inherits <see cref="AbstractStream"/> and writes into a specified file. Note, the file stream remains
     /// as long open as the file stream instance exists. 
     /// </summary>
-    public class FileStream : ILogStream, FileStream._Bender {
+    public class FileStream : AbstractStream, FileStream._Bender {
         private AbstractStreamWriter _streamWriter;
 
         /// <inheritdoc />
@@ -16,7 +16,7 @@ namespace xcite.logging.streams {
         }
 
         /// <inheritdoc />
-        public virtual void Dispose() {
+        public override void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -37,7 +37,7 @@ namespace xcite.logging.streams {
         public bool DailyRolling { get; set; }
 
         /// <inheritdoc />
-        public virtual void Write(string value) {
+        public override void Write(string value) {
             if (string.IsNullOrEmpty(FileName) || string.IsNullOrEmpty(value)) return;
             
             AbstractStreamWriter streamWriter = GetStreamWriter();

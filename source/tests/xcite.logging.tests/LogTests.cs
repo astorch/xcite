@@ -96,7 +96,7 @@ namespace xcite.logging.tests {
                 // Nothing to do here
             }
 
-            public void Write(string value) {
+            public void Write(string value, string logName) {
                 _stringBuilder.Append(value);
             }
 

@@ -137,10 +137,17 @@ namespace xcite.logging {
                 if (lcStreamProp != lcProp) continue;
 
                 object val;
-                if (logStreamProperty.PropertyType.IsEnum)
-                    val = Enum.Parse(logStreamProperty.PropertyType, value, true);
-                else
-                    val = Convert.ChangeType(value, logStreamProperty.PropertyType);
+                Type propertyType = logStreamProperty.PropertyType;
+                
+                if (propertyType.IsEnum)
+                    val = Enum.Parse(propertyType, value, true);
+                else if (propertyType.IsArray && propertyType.GetElementType() == typeof(string)) {
+                    string[] types = value.Split(',');
+                    for (int j = types.Length - 1; j >= 0; j--)
+                        types[j] = types[j].Trim();
+                    val = types;
+                } else
+                    val = Convert.ChangeType(value, propertyType);
                 
                 logStreamProperty.SetValue(logStream, val);
                 return;
