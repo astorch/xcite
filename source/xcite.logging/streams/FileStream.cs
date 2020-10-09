@@ -209,7 +209,7 @@ namespace xcite.logging.streams {
         /// Implementation of <see cref="AbstractStreamWriter"/> that does not acquire
         /// a lock for the log file. Other processes can always read the file.
         /// </summary>
-        class NonLockingStreamWriter : AbstractStreamWriter {
+        private class NonLockingStreamWriter : AbstractStreamWriter {
             /// <inheritdoc />
             protected override System.IO.FileStream OnInitStream(string fileName, FileMode fileMode) {
                 return new System.IO.FileStream(fileName, fileMode, FileAccess.Write, FileShare.Read);
