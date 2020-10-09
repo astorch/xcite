@@ -20,27 +20,27 @@ namespace xcite.logging {
 
             string fileContent = File.ReadAllText(fileName);
             LogConfiguration logConfig = ReadText(fileContent);
-            
-            if (watch) {
-                string fileDir = Path.GetDirectoryName(fullPath);
-                if (fileDir == null) throw new ArgumentException($"Cannot resolve containing folder of file '{fullPath}'.");
-            
-                string simpleFileName = Path.GetFileName(fullPath);
 
-                // ReSharper disable once InconsistentNaming
-                void updateLogConfiguration(object sender, FileSystemEventArgs e) {
-                    OnFileChanged(logConfig, e);
-                }
-
-                if (_fileSystemWatcher != null) {
-                    _fileSystemWatcher.Changed -= updateLogConfiguration; // Does this really work?
-                    _fileSystemWatcher.Dispose();
-                    _fileSystemWatcher = null;                
-                }
+            if (!watch) return logConfig;
             
-                _fileSystemWatcher = new FileSystemWatcher(fileDir, simpleFileName);
-                _fileSystemWatcher.Changed += updateLogConfiguration;
+            string fileDir = Path.GetDirectoryName(fullPath);
+            if (fileDir == null) throw new ArgumentException($"Cannot resolve containing folder of file '{fullPath}'.");
+            
+            string simpleFileName = Path.GetFileName(fullPath);
+
+            // ReSharper disable once InconsistentNaming
+            void updateLogConfiguration(object sender, FileSystemEventArgs e) {
+                OnFileChanged(logConfig, e);
             }
+
+            if (_fileSystemWatcher != null) {
+                _fileSystemWatcher.Changed -= updateLogConfiguration; // Does this really work?
+                _fileSystemWatcher.Dispose();
+                _fileSystemWatcher = null;                
+            }
+            
+            _fileSystemWatcher = new FileSystemWatcher(fileDir, simpleFileName);
+            _fileSystemWatcher.Changed += updateLogConfiguration;
 
             return logConfig;
         }
@@ -69,11 +69,8 @@ namespace xcite.logging {
                 if (linePair.Length != 2) continue; // Invalid format
 
                 char[] bias = {' ', '\t', '\r'};
-                string key = linePair[0]?.Trim(bias).ToLower();
-                string value = linePair[1]?.Trim(bias);
-                
-                if (key == null) continue;
-                if (value == null) continue;
+                string key = linePair[0].Trim(bias).ToLower();
+                string value = linePair[1].Trim(bias);
                 
                 // Reserved word
                 if (key == "level") {
@@ -90,8 +87,7 @@ namespace xcite.logging {
                 if (key == "streams") {
                     string[] streamNames = value.Split(',');
                     for (int j = -1; ++j != streamNames.Length;) {
-                        string streamName = streamNames[j]?.Trim();
-                        if (streamName == null) continue;
+                        string streamName = streamNames[j].Trim();
                         streamSet[streamName] = null;
                     }
                     continue;
