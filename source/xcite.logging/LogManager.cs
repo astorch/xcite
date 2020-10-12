@@ -59,63 +59,69 @@ namespace xcite.logging {
 
             /// <inheritdoc />
             public void Fatal(string value) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Fatal, value = value});
+                _lgOp.Write(CreateLogData(ELogLevel.Fatal, value, null));
             }
 
             /// <inheritdoc />
             public void Fatal(string value, Exception exception) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Fatal, value = value, exception = exception});
+                _lgOp.Write(CreateLogData(ELogLevel.Fatal, value, exception));
             }
 
             /// <inheritdoc />
             public void Error(string value) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Error, value = value});
+                _lgOp.Write(CreateLogData(ELogLevel.Error, value, null));
             }
 
             /// <inheritdoc />
             public void Error(string value, Exception exception) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Error, value = value, exception = exception});
+                _lgOp.Write(CreateLogData(ELogLevel.Error, value, exception));
             }
 
             /// <inheritdoc />
             public void Warning(string value) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Warn, value = value});
+                _lgOp.Write(CreateLogData(ELogLevel.Warn, value, null));
             }
 
             /// <inheritdoc />
             public void Warning(string value, Exception exception) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Warn, value = value, exception = exception});
+                _lgOp.Write(CreateLogData(ELogLevel.Warn, value, exception));
             }
 
             /// <inheritdoc />
             public void Info(string value) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Info, value = value});
+                _lgOp.Write(CreateLogData(ELogLevel.Info, value, null));
             }
 
             /// <inheritdoc />
             public void Info(string value, Exception exception) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Info, value = value, exception = exception});
+                _lgOp.Write(CreateLogData(ELogLevel.Info, value, exception));
             }
 
             /// <inheritdoc />
             public void Trace(string value) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Trace, value = value});
+                _lgOp.Write(CreateLogData(ELogLevel.Trace, value, null));
             }
 
             /// <inheritdoc />
             public void Trace(string value, Exception exception) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Trace, value = value, exception = exception});
+                _lgOp.Write(CreateLogData(ELogLevel.Trace, value, exception));
             }
 
             /// <inheritdoc />
             public void Debug(string value) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Debug, value = value});
+                _lgOp.Write(CreateLogData(ELogLevel.Debug, value, null));
             }
 
             /// <inheritdoc />
             public void Debug(string value, Exception exception) {
-                _lgOp.Write(new LogData {name = _logName, level = ELogLevel.Debug, value = value, exception = exception});
+                _lgOp.Write(CreateLogData(ELogLevel.Debug, value, exception));
             }
+
+            /// <summary> Creates a new instance of <see cref="LogData"/> with the specified arguments. </summary>
+            [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            private LogData CreateLogData(ELogLevel logLevel, string value, Exception exception)
+                => new LogData {name = _logName, level = logLevel, value = value, exception = exception};
+
         }
     }
 }
