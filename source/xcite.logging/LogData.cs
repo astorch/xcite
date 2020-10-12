@@ -2,7 +2,8 @@ using System;
 
 namespace xcite.logging {
     /// <summary> Describes the data to log. </summary>
-    public class LogData {
+    public struct LogData {
+        
         /// <summary> Logger name </summary>
         public string name;
         
@@ -14,5 +15,6 @@ namespace xcite.logging {
         
         /// <summary> Log excecption </summary>
         public Exception exception;
+        
     }
 }
