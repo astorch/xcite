@@ -18,7 +18,7 @@ namespace xcite.logging.tests {
 
             // Act
             using (fileStream) {
-                fileStream.Write(logText);    
+                fileStream.Write(logText, new LogData());    
             }
 
             // Assert
@@ -41,9 +41,9 @@ namespace xcite.logging.tests {
             DateTime yesterday = today.AddDays(-1);
 
             // Act
-            fileStream.Write(logTextYesterday);
+            fileStream.Write(logTextYesterday, new LogData());
             ((FileStream._Bender) fileStream).SetLastWrite(yesterday);
-            fileStream.Write(logTextToday);
+            fileStream.Write(logTextToday, new LogData());
             
             fileStream.Dispose();
 
@@ -82,7 +82,7 @@ namespace xcite.logging.tests {
             
             // Act
             using (fileStream) {
-                fileStream.Write(recordText);
+                fileStream.Write(recordText, new LogData());
             }
             
             // Assert
@@ -107,7 +107,7 @@ namespace xcite.logging.tests {
            // Act
            FileStream fileStream = new FileStream {FileName = logFile, Append = true};
            using (fileStream) {
-               fileStream.Write(recordText);
+               fileStream.Write(recordText, new LogData());
            }
 
            // Assert
@@ -135,7 +135,7 @@ namespace xcite.logging.tests {
             // Act
             FileStream fileStream = new FileStream {FileName = logFile, Append = false};
             using (fileStream) {
-                fileStream.Write(recordText);
+                fileStream.Write(recordText, new LogData());
             }
 
             // Assert

@@ -104,7 +104,8 @@ namespace xcite.logging.tests {
             string value2 = tf.FormatValue(pattern, logData);
             
             // Assert
-            Assert.AreEqual($"TRACE {timestamp} [11] Almoner - This is a message\r\n", value1);
+            int threadId = Thread.CurrentThread.ManagedThreadId;
+            Assert.AreEqual($"TRACE {timestamp} [{threadId}] Almoner - This is a message\r\n", value1);
             Assert.AreEqual(value1, value2);
         }
     }
