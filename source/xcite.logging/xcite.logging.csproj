@@ -16,7 +16,6 @@
         <Version>2.1.0</Version>
         <IncludeSource>True</IncludeSource>
         <IncludeSymbols>True</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
 
