@@ -78,6 +78,49 @@ namespace xcite.logging.tests {
             ILogStream fileStream = lgCfg.Streams[2];
             Assert.AreEqual(typeof(FileStream), fileStream.GetType());
         }
+        
+        [Test]
+        public void ReadWithCustomStream() {
+            // Arrange
+            string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog4.cfg");
+
+            // Act
+            LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
+            
+            // Assert
+            Assert.IsNotNull(lgCfg);
+            Assert.AreEqual(ELogLevel.Debug, lgCfg.Level);
+            Assert.AreEqual("%date %level %text%nl", lgCfg.Pattern);
+            
+            Assert.AreEqual(2, lgCfg.Streams.Length);
+            
+            ILogStream customStream = lgCfg.Streams[0];
+            Assert.AreEqual(typeof(ConsoleStream), customStream.GetType());
+
+            ILogStream hiddenStream = lgCfg.Streams[1];
+            Assert.AreEqual(typeof(HiddenStream), hiddenStream.GetType());
+        }
+        
+        [Test]
+        public void ReadWithTypes() {
+            // Arrange
+            string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog5.cfg");
+
+            // Act
+            LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
+            
+            // Assert
+            Assert.IsNotNull(lgCfg);
+            Assert.AreEqual(ELogLevel.Debug, lgCfg.Level);
+            Assert.AreEqual("%date %level %text%nl", lgCfg.Pattern);
+            
+            Assert.AreEqual(1, lgCfg.Streams.Length);
+            
+            ILogStream stream = lgCfg.Streams[0];
+            
+            Assert.IsTrue(stream is AbstractStream);
+            CollectionAssert.AreEqual(new[] { "foo", "bar" }, ((AbstractStream)stream).Types);
+        }
 
         [Test]
         public void SetLogManagerConfiguration() {
@@ -111,6 +154,18 @@ namespace xcite.logging.tests {
             log2.Info("Re-initialized");
             
             // Assert
+        }
+
+        class HiddenStream : AbstractStream {
+
+            protected override void OnDispose(bool disposing) {
+                
+            }
+
+            protected override void Write(string value) {
+                
+            }
+            
         }
     }
 }
