@@ -1,14 +1,16 @@
 namespace xcite.logging.streams {
-    /// <summary> Implements <see cref="ILogStream"/> to print records onto the .NET trace environment. </summary>
+    /// <summary> Inherits <see cref="AbstractStream"/> to print records onto the .NET trace environment. </summary>
     /// <seealso cref="System.Diagnostics.Debug"/>
-    public class TraceStream : ILogStream {
+    public class TraceStream : AbstractStream {
+        
         /// <inheritdoc />
-        public virtual void Dispose() {
+        protected override void OnDispose(bool disposing) {
             // Nothing to do here
         }
 
         /// <inheritdoc />
-        public virtual void Write(string value) 
+        protected override void Write(string value) 
             => System.Diagnostics.Trace.Write(value);
+        
     }
 }

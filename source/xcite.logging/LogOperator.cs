@@ -5,7 +5,7 @@ namespace xcite.logging {
         private readonly TextFormatter _textFormatter;
         private readonly LogStreamManager _streamManager;
 
-        /// <inheritdoc />
+        /// <summary> Initializes the new instance with the specified arguments. </summary>
         public LogOperator(LogConfiguration config, TextFormatter textFormatter, LogStreamManager streamManager) { 
             _config = config;
             _textFormatter = textFormatter;
@@ -21,18 +21,19 @@ namespace xcite.logging {
             ILogStream[] logStreams = _config.Streams;
             
             string record = _textFormatter.FormatValue(pattern, logData);
-            _streamManager.Write(logStreams, logData.name, logData.level, record);
+            _streamManager.Write(logStreams, logData, record);
 
-            if (logData.exception != null) {
-                LogData exLgDt = new LogData {
-                    name = logData.name, level = logData.level,
-                    value = logData.exception.ToString(),
-                    exception = logData.exception
-                };
+            if (logData.exception == null) return;
+            
+            LogData exLgDt = new LogData {
+                name = logData.name, level = logData.level,
+                value = logData.exception.ToString(),
+                exception = logData.exception
+            };
 
-                string exRec = _textFormatter.FormatValue(pattern, exLgDt);
-                _streamManager.Write(logStreams, exLgDt.name, exLgDt.level, exRec);
-            }
+            string exRec = _textFormatter.FormatValue(pattern, exLgDt);
+            _streamManager.Write(logStreams, exLgDt, exRec);
         }
+        
     }
 }

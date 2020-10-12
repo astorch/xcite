@@ -1,15 +1,17 @@
 using System;
 
 namespace xcite.logging.streams {
-    /// <summary> Implements <see cref="ILogStream"/> to print records onto the console. </summary>
-    public class ConsoleStream : ILogStream {
+    /// <summary> Inherits <see cref="AbstractStream"/> to print records onto the console. </summary>
+    public class ConsoleStream : AbstractStream {
+        
         /// <inheritdoc />
-        public virtual void Dispose() {
-            // Noting to do here
+        protected override void OnDispose(bool disposing) {
+            // Nothing to do here
         }
 
         /// <inheritdoc />
-        public virtual void Write(string value) 
+        protected override void Write(string value) 
             => Console.Out.Write(value);
+        
     }
 }

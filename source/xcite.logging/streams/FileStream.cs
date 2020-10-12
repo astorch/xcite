@@ -4,28 +4,24 @@ using System.Text;
 
 namespace xcite.logging.streams {
     /// <summary>
-    /// Implements <see cref="ILogStream"/> that writes into a specified file. Note, the file stream remains
+    /// Inherits <see cref="AbstractStream"/> and writes into a specified file. Note, the file stream remains
     /// as long open as the file stream instance exists. 
     /// </summary>
-    public class FileStream : ILogStream, FileStream._Bender {
+    public class FileStream : AbstractStream, FileStream._Bender {
         private AbstractStreamWriter _streamWriter;
 
         /// <inheritdoc />
-        ~FileStream() {
-            Dispose(false);
-        }
-
-        /// <inheritdoc />
-        public virtual void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+        protected override void OnDispose(bool disposing) {
+            ReleaseUnmanagedResources();
+            _streamWriter?.Dispose();
+            _streamWriter = null;
         }
 
         /// <summary> Name of the file the stream writes to. </summary>
         public string FileName { get; set; }
 
         /// <summary>
-        /// Flag to determine wheter the file should be appended or overwritten.
+        /// Flag to determine whether the file should be appended or overwritten.
         /// Default is TRUE.
         /// </summary>
         public bool Append { get; set; } = true;
@@ -37,7 +33,7 @@ namespace xcite.logging.streams {
         public bool DailyRolling { get; set; }
 
         /// <inheritdoc />
-        public virtual void Write(string value) {
+        protected override void Write(string value) {
             if (string.IsNullOrEmpty(FileName) || string.IsNullOrEmpty(value)) return;
             
             AbstractStreamWriter streamWriter = GetStreamWriter();
@@ -93,13 +89,13 @@ namespace xcite.logging.streams {
             if (currentStream == null) return null;
 
             // When nothing has been written to the stream yet, there is nothing to check
-            if (currentStream._lastWrite == default) return currentStream;
+            if (currentStream.lastWrite == default) return currentStream;
 
             // When the day hasn't changed yet, there is nothing to do
-            if (currentStream._lastWrite.Day == DateTime.Today.Day) return currentStream;
+            if (currentStream.lastWrite.Day == DateTime.Today.Day) return currentStream;
             
             // Close stream
-            DateTime lastWriteDay = currentStream._lastWrite;
+            DateTime lastWriteDay = currentStream.lastWrite;
             currentStream.Dispose();
             
             // Calculate new file name
@@ -127,24 +123,17 @@ namespace xcite.logging.streams {
             // Clients may override
         }
 
-        /// <summary> Is invoked when instance is being disposed. </summary>
-        private void Dispose(bool disposing) {
-            ReleaseUnmanagedResources();
-            _streamWriter?.Dispose();
-            _streamWriter = null;
-        }
-
         /// <inheritdoc />
         void _Bender.SetLastWrite(DateTime value) {
             if (_streamWriter == null) return;
-            _streamWriter._lastWrite = value;
+            _streamWriter.lastWrite = value;
         }
 
         /// <summary> Defines a locking model aware file stream writer.
         /// </summary>
         protected abstract class AbstractStreamWriter : IDisposable {
             private System.IO.FileStream _fileStream;
-            public DateTime _lastWrite;
+            public DateTime lastWrite;
             
             /// <summary>
             /// Initializes a file stream with the specified <paramref name="fileName"/>.
@@ -169,7 +158,7 @@ namespace xcite.logging.streams {
             public virtual void WriteToStream(byte[] data) {
                 _fileStream.Write(data, 0, data.Length);
                 _fileStream.Flush();
-                _lastWrite = DateTime.Today;
+                lastWrite = DateTime.Today;
             }
 
             /// <summary>
@@ -209,7 +198,7 @@ namespace xcite.logging.streams {
         /// Implementation of <see cref="AbstractStreamWriter"/> that does not acquire
         /// a lock for the log file. Other processes can always read the file.
         /// </summary>
-        class NonLockingStreamWriter : AbstractStreamWriter {
+        private class NonLockingStreamWriter : AbstractStreamWriter {
             /// <inheritdoc />
             protected override System.IO.FileStream OnInitStream(string fileName, FileMode fileMode) {
                 return new System.IO.FileStream(fileName, fileMode, FileAccess.Write, FileShare.Read);

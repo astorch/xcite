@@ -5,12 +5,12 @@ namespace xcite.logging {
         
         /// <summary>
         /// Writes the given <paramref name="value"/> into each stream of the given <paramref name="logStreams"/>
-        /// that match the specified <paramref name="logName"/> and <paramref name="logLevel"/>.
+        /// that match the specified <paramref name="logData"/>.
         /// </summary>
-        public void Write(ILogStream[] logStreams, string logName, ELogLevel logLevel, string value) {
+        public void Write(ILogStream[] logStreams, LogData logData, string value) {
             lock (_accessToken) {
-                for (int i = -1; ++i != logStreams.Length;)
-                    logStreams[i].Write(value);
+                for (int i = -1, ilen = logStreams.Length; ++i != ilen;)
+                    logStreams[i].Write(value, logData);
             }
         }
     }
