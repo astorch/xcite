@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using NUnit.Framework;
 using FileStream = xcite.logging.streams.FileStream;
 
@@ -143,10 +144,37 @@ namespace xcite.logging.tests {
 
             string logFileText = File.ReadAllText(logFile);
             Assert.IsNotEmpty(logFileText);
-            Assert.AreEqual(
-                recordText,
-                logFileText
-            );
+            Assert.AreEqual(recordText, logFileText);
+        }
+
+        [Test]
+        public void WriteMinimalLocking() {
+            // Arrange
+            string baseText = "This is the first line\n";
+            string recordText = "This is the recorded line.";
+            string logFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "fileToAppend.txt");
+            if (File.Exists(logFile))
+                File.Delete(logFile);
+            
+            // Act
+            FileStream fileStream = new FileStream {FileName = logFile, Append = true, LockingModel = ELockingModel.Minimal};
+            using (fileStream) {
+                fileStream.Write(baseText, new LogData());
+                fileStream.Write(recordText, new LogData());
+            }
+            
+            // Assert
+            Assert.IsTrue(File.Exists(logFile));
+
+            string logFileText = File.ReadAllText(logFile);
+            Assert.IsNotEmpty(logFileText);
+            
+            string expectedText = new StringBuilder()
+                .Append(baseText)
+                .Append(recordText)
+                .ToString();
+            
+            Assert.AreEqual(expectedText, logFileText);
         }
     }
 }
