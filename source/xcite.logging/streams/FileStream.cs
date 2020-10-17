@@ -41,11 +41,11 @@ namespace xcite.logging.streams {
             
             byte[] data = Encoding.UTF8.GetBytes(value);
             
-            streamWriter.LockStream();
+            streamWriter.LockStream(data.Length);
             try {
                 streamWriter.WriteToStream(data);
             } finally {
-                streamWriter.UnlockStream();
+                streamWriter.UnlockStream(data.Length);
             }
         }
 
@@ -151,8 +151,8 @@ namespace xcite.logging.streams {
             /// Notifies the instance to lock the file stream so that no other
             /// process can access the file.
             /// </summary>
-            public virtual void LockStream() 
-                => OnLockStream(_fileStream);
+            public virtual void LockStream(int size) 
+                => OnLockStream(_fileStream, size);
 
             /// <summary> Writes the given <paramref name="data"/> to the underlying stream. </summary>
             public virtual void WriteToStream(byte[] data) {
@@ -165,8 +165,8 @@ namespace xcite.logging.streams {
             /// Notifies the instance to unlock the file stream so that other
             /// processes may access the file.
             /// </summary>
-            public virtual void UnlockStream() 
-                => OnUnlockStream(_fileStream);
+            public virtual void UnlockStream(int size) 
+                => OnUnlockStream(_fileStream, size);
 
             /// <inheritdoc />
             public virtual void Dispose() {
@@ -185,13 +185,13 @@ namespace xcite.logging.streams {
             /// Is invoked when <see cref="LockStream"/> is called. Sub-classes
             /// can add custom behavior to the stream.
             /// </summary>
-            protected abstract void OnLockStream(System.IO.FileStream fileStream);
+            protected abstract void OnLockStream(System.IO.FileStream fileStream, int size);
 
             /// <summary>
             /// Is invoked when <see cref="UnlockStream"/> is called. Sub-classes
             /// can add custom behavior to the stream.
             /// </summary>
-            protected abstract void OnUnlockStream(System.IO.FileStream fileStream);
+            protected abstract void OnUnlockStream(System.IO.FileStream fileStream, int size);
         }
 
         /// <summary>
@@ -201,16 +201,16 @@ namespace xcite.logging.streams {
         private class NonLockingStreamWriter : AbstractStreamWriter {
             /// <inheritdoc />
             protected override System.IO.FileStream OnInitStream(string fileName, FileMode fileMode) {
-                return new System.IO.FileStream(fileName, fileMode, FileAccess.Write, FileShare.Read);
+                return new System.IO.FileStream(fileName, fileMode, FileAccess.Write, FileShare.ReadWrite);
             }
 
             /// <inheritdoc />
-            protected override void OnLockStream(System.IO.FileStream fileStream) {
+            protected override void OnLockStream(System.IO.FileStream fileStream, int size) {
                 // No lock
             }
 
             /// <inheritdoc />
-            protected override void OnUnlockStream(System.IO.FileStream fileStream) {
+            protected override void OnUnlockStream(System.IO.FileStream fileStream, int size) {
                 // No unlock
             }
         }
@@ -227,13 +227,13 @@ namespace xcite.logging.streams {
             }
 
             /// <inheritdoc />
-            protected override void OnLockStream(System.IO.FileStream fileStream) {
-                fileStream.Lock(0, fileStream.Length);
+            protected override void OnLockStream(System.IO.FileStream fileStream, int size) {
+                // No additional lock required
             }
 
             /// <inheritdoc />
-            protected override void OnUnlockStream(System.IO.FileStream fileStream) {
-                fileStream.Unlock(0, fileStream.Length);
+            protected override void OnUnlockStream(System.IO.FileStream fileStream, int size) {
+                // No additional lock required
             }
         }
 
@@ -249,12 +249,12 @@ namespace xcite.logging.streams {
             }
 
             /// <inheritdoc />
-            protected override void OnLockStream(System.IO.FileStream fileStream) {
+            protected override void OnLockStream(System.IO.FileStream fileStream, int size) {
                 // No additional lock required
             }
 
             /// <inheritdoc />
-            protected override void OnUnlockStream(System.IO.FileStream fileStream) {
+            protected override void OnUnlockStream(System.IO.FileStream fileStream, int size) {
                 // No additional unlock required
             }
         }
