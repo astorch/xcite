@@ -8,7 +8,7 @@ namespace xcite.logging {
     public class LogConfiguration {
         private readonly List<ILogStream> _logStreams = new List<ILogStream>(10);
 
-        /// <inheritdoc />
+        /// <summary> Initializes the new instance </summary>
         public LogConfiguration() {
             Reset();
         }

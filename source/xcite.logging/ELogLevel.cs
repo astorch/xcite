@@ -30,7 +30,7 @@ namespace xcite.logging {
         private readonly string _name;
         private readonly int _severity;
 
-        /// <inheritdoc />
+        /// <summary> Initializes the new instance with the given property values. </summary>
         private ELogLevel(string name, int severity) {
             _name = name;
             _severity = severity;
@@ -67,7 +67,7 @@ namespace xcite.logging {
         public static bool TryParse(string value, out ELogLevel level) {
             level = None;
             string lcval = value.ToLower();
-            for (int i = -1; ++i != Values.Length;) {
+            for (int i = -1, ilen = Values.Length; ++i != ilen;) {
                 ELogLevel lgLvl = Values[i];
                 string lgLvlName = lgLvl._name.ToLower();
                 if (lgLvlName != lcval) continue;

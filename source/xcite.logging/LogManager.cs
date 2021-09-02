@@ -42,7 +42,7 @@ namespace xcite.logging {
                 .SetPattern(config.Pattern);
 
             ILogStream[] logStreams = config.Streams;
-            for (int i = -1; ++i != logStreams.Length;) {
+            for (int i = -1, ilen = logStreams.Length; ++i != ilen;) {
                 _config.AddStream(logStreams[i]);
             }
         }
