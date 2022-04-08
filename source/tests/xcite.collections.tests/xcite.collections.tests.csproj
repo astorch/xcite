@@ -54,16 +54,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xcite.collections\xcite.collections.csproj">
-      <Project>{02e88ec9-0823-4c0d-9435-3b5975c00e5d}</Project>
-      <Name>xcite.collections</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\projects\xcite.collections\xcite.collections.csproj">
+      <Project>{02e88ec9-0823-4c0d-9435-3b5975c00e5d}</Project>
+      <Name>xcite.collections</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -50,18 +50,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xcite.somon\xcite.somon.csproj">
-      <Project>{18eef960-9369-4c54-8e8c-c77a9218ecff}</Project>
-      <Name>xcite.somon</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="SomonCase1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\projects\xcite.somon\xcite.somon.csproj">
+      <Project>{18eef960-9369-4c54-8e8c-c77a9218ecff}</Project>
+      <Name>xcite.somon</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

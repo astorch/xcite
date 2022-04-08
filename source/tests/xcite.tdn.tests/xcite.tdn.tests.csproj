@@ -52,16 +52,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xcite.tdn\xcite.tdn.csproj">
-      <Project>{57e1d261-a970-4ef2-b8da-934b27fa6994}</Project>
-      <Name>xcite.tdn</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
     <None Include="sample1.tdn.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\projects\xcite.tdn\xcite.tdn.csproj">
+      <Project>{57e1d261-a970-4ef2-b8da-934b27fa6994}</Project>
+      <Name>xcite.tdn</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

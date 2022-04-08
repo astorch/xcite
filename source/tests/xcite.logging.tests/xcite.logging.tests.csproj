@@ -50,12 +50,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xcite.logging\xcite.logging.csproj">
-      <Project>{3ca389b1-ba10-45b9-ad6d-2fc5c116ccbb}</Project>
-      <Name>xcite.logging</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
     <None Include="_utlog.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -76,6 +70,12 @@
     <Content Include="_utlog5.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\projects\xcite.logging\xcite.logging.csproj">
+      <Project>{3ca389b1-ba10-45b9-ad6d-2fc5c116ccbb}</Project>
+      <Name>xcite.logging</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

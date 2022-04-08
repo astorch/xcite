@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.csharp", "xcite.csharp\xcite.csharp.csproj", "{0F48CE04-81EB-45A9-AC70-08EAF7F71C75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.csharp", "projects\xcite.csharp\xcite.csharp.csproj", "{0F48CE04-81EB-45A9-AC70-08EAF7F71C75}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.io", "xcite.io\xcite.io.csproj", "{B20F99A7-15D5-44E7-A4ED-5EF1EC8A9970}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.io", "projects\xcite.io\xcite.io.csproj", "{B20F99A7-15D5-44E7-A4ED-5EF1EC8A9970}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.messaging", "xcite.messaging\xcite.messaging.csproj", "{A8E7B329-9065-4FA8-A4AA-9F14E61A8C53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.messaging", "projects\xcite.messaging\xcite.messaging.csproj", "{A8E7B329-9065-4FA8-A4AA-9F14E61A8C53}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.collections", "xcite.collections\xcite.collections.csproj", "{02E88EC9-0823-4C0D-9435-3B5975C00E5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.collections", "projects\xcite.collections\xcite.collections.csproj", "{02E88EC9-0823-4C0D-9435-3B5975C00E5D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4065A432-A35A-4B3E-A3D4-EC995EED372B}"
 EndProject
@@ -17,27 +17,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.collections.tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.csharp.tests", "tests\xcite.csharp.tests\xcite.csharp.tests.csproj", "{2154EE29-50A8-4D72-A136-70427397D9FF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.tean", "xcite.tean\xcite.tean.csproj", "{7D420D53-469B-4F4B-8311-27DD532F9F8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.tean", "projects\xcite.tean\xcite.tean.csproj", "{7D420D53-469B-4F4B-8311-27DD532F9F8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.tean.tests", "tests\xcite.tean.tests\xcite.tean.tests.csproj", "{BEAA33FF-DDF1-430B-AF38-D58B3B707C39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.nio", "xcite.nio\xcite.nio.csproj", "{BE042F6F-299F-48FF-947B-4B90770FA4AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.nio", "projects\xcite.nio\xcite.nio.csproj", "{BE042F6F-299F-48FF-947B-4B90770FA4AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.nio.tests", "tests\xcite.nio.tests\xcite.nio.tests.csproj", "{22AF8683-06EE-44F9-A058-CA0BBF76C548}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.somon", "xcite.somon\xcite.somon.csproj", "{18EEF960-9369-4C54-8E8C-C77A9218ECFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.somon", "projects\xcite.somon\xcite.somon.csproj", "{18EEF960-9369-4C54-8E8C-C77A9218ECFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.somon.tests", "tests\xcite.somon.tests\xcite.somon.tests.csproj", "{1776B3AA-E9AB-4AFC-9B0E-184EAC2CC464}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.tdn", "xcite.tdn\xcite.tdn.csproj", "{57E1D261-A970-4EF2-B8DA-934B27FA6994}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.tdn", "projects\xcite.tdn\xcite.tdn.csproj", "{57E1D261-A970-4EF2-B8DA-934B27FA6994}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.tdn.tests", "tests\xcite.tdn.tests\xcite.tdn.tests.csproj", "{BBF32CF5-7BD0-4937-8E30-1232F2C024F1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.logging", "xcite.logging\xcite.logging.csproj", "{3CA389B1-BA10-45B9-AD6D-2FC5C116CCBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xcite.logging", "projects\xcite.logging\xcite.logging.csproj", "{3CA389B1-BA10-45B9-AD6D-2FC5C116CCBB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.logging.tests", "tests\xcite.logging.tests\xcite.logging.tests.csproj", "{5FA8CAAB-5EBB-4582-A1D7-A62331DA5750}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.clip", "xcite.clip\xcite.clip.csproj", "{5DC676F8-3EE4-420C-9B3C-32F10F15AFB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.clip", "projects\xcite.clip\xcite.clip.csproj", "{5DC676F8-3EE4-420C-9B3C-32F10F15AFB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcite.clip.tests", "tests\xcite.clip.tests\xcite.clip.tests.csproj", "{0CFCF3EA-43B7-457C-84FC-B50400703AE5}"
 EndProject

@@ -54,12 +54,6 @@
     <Compile Include="WordIteratorTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xcite.tean\xcite.tean.csproj">
-      <Project>{7d420d53-469b-4f4b-8311-27dd532f9f8b}</Project>
-      <Name>xcite.tean</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="samples\text-sample1.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +67,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\projects\xcite.tean\xcite.tean.csproj">
+      <Project>{7d420d53-469b-4f4b-8311-27dd532f9f8b}</Project>
+      <Name>xcite.tean</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
