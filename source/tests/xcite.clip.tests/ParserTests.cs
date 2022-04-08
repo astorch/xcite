@@ -47,7 +47,7 @@ namespace xcite.clip.tests {
         [Test]
         public void PrintUsageWithVerb() {
             string usage;
-            using (StringWriter strWtr = new StringWriter(new StringBuilder(1000))) {
+            using (StringWriter strWtr = new(new StringBuilder(1000))) {
                 VerbInfo verbNfo = (VerbInfo) ReflectionKit.InvokeStaticMethod(typeof(Parser), "GetVerb",
                     new[] {typeof(string), typeof(Type[])},
                     new object[] {
@@ -86,6 +86,49 @@ namespace xcite.clip.tests {
             Assert.IsTrue(usage.Contains("      -m, --Mode     (Default Normal) Unpack mode"));
             Assert.IsTrue(usage.Contains("      -n, --name     (Required) Name of the machine to address"));
             Assert.IsTrue(usage.Contains("      -p, --port     (Default 9898) Port of the machine to address"));
+            Assert.IsTrue(usage.Contains("Missing arguments. Check help!"));
+        }
+
+        [Test]
+        public void PrintUsageWithVerbAndLongDescription() {
+            string usage;
+            using (StringWriter strWtr = new(new StringBuilder(1000))) {
+                VerbInfo verbNfo = (VerbInfo) ReflectionKit.InvokeStaticMethod(typeof(Parser), "GetVerb",
+                    new[] {typeof(string), typeof(Type[])},
+                    new object[] {
+                        "detail",
+                        new[] {typeof(DetailOptions), typeof(UnpackOptions)}
+                    });
+
+                ReflectionKit.InvokeStaticMethod(typeof(Parser), "PrintUsageWithError",
+                    new[] {
+                        typeof(TextWriter),
+                        typeof(string),
+                        typeof(Type[]),
+                        typeof(VerbInfo)
+                    },
+                    new object[] {
+                        strWtr,
+                        "Missing required argument.",
+                        new[] {typeof(UnpackOptions), typeof(CopyOptions)},
+                        verbNfo, 
+                    });
+                usage = strWtr.ToString();
+            }
+
+            Assert.IsNotNull(usage);
+            Assert.IsNotEmpty(usage);
+
+            // Assert.IsTrue(usage.Contains("xcite.clip.tests 1.0.0.0"));
+            Assert.IsTrue(usage.Contains("ReSharperTestRunner 2.6.2.69"));
+            // Assert.IsTrue(usage.Contains("Copyright ©  2019"));
+            Assert.IsTrue(usage.Contains("ERROR(S)"));
+            Assert.IsTrue(usage.Contains("Missing required argument."));
+            Assert.IsTrue(usage.Contains("ARGUMENT(S)"));
+            Assert.IsTrue(usage.Contains("       -x, --ex     Might do something. Don't known."));
+            Assert.IsTrue(usage.Contains("  -y, --ypsilon     (Required) This really does something. So it's heavily recommended to activate this option,"));
+            Assert.IsTrue(usage.Contains("                    so that you can see some awesome features that you would have never expected. If you have"));
+            Assert.IsTrue(usage.Contains("                    some further questions, please ask the programmer."));
             Assert.IsTrue(usage.Contains("Missing arguments. Check help!"));
         }
 
