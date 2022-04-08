@@ -287,7 +287,7 @@ namespace xcite.clip {
             string[] headlines = new string[options.Length];
             string[] bodylines = new string[options.Length];
             int maxOptionNameChars = 0;
-            for (int i = -1; ++i != options.Length;) {
+            for (int i = -1, ilen = options.Length; ++i != ilen;) {
                 OptionInfo option = options[i];
                 string shortName = option.GetShortName();
                 string fullName = option.GetFullName();
@@ -316,7 +316,7 @@ namespace xcite.clip {
                 bodylines[i] = bodyline;
             }
             
-            for (int i = -1; ++i != headlines.Length;) {
+            for (int i = -1, ilen =headlines.Length; ++i != ilen;) {
                 string headline = headlines[i];
                 string bodyline = bodylines[i];
                 string fullline = string.Concat(
@@ -326,7 +326,19 @@ namespace xcite.clip {
                     bodyline.PadRight(padRight)
                 );
 
-                stream.WriteLine(fullline);
+                string[] fulllineParts = fullline.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                stream.WriteLine(fulllineParts[0]);
+
+                if (fulllineParts.Length > 1) {
+                    int wsCount = leftOffset.Length + maxOptionNameChars + midOffset.Length;
+                    string leadingWhitespaces = new string(' ', wsCount);
+                    for (int j = 0, jlen = fulllineParts.Length; ++j != jlen;) {
+                        string fulllinePart = fulllineParts[j];
+                        string shiftedPart = string.Concat(leadingWhitespaces, fulllinePart);
+                        stream.WriteLine(shiftedPart);
+                    }
+                }
+
                 stream.WriteLine();
             }
 
