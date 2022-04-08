@@ -1,7 +1,7 @@
-﻿namespace xcite.clip.tests {
-    public enum EMode {
-        Normal,
-        Fast,
-        Best
-    }
+﻿namespace xcite.clip.tests; 
+
+public enum EMode {
+    Normal,
+    Fast,
+    Best
 }
