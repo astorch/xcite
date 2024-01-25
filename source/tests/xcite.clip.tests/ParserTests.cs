@@ -30,18 +30,18 @@ namespace xcite.clip.tests {
                 usage = strWtr.ToString();
             }
             
-            Assert.IsNotNull(usage);
-            Assert.IsNotEmpty(usage);
-
+            Assert.That(usage, Is.Not.Null);
+            Assert.That(usage, Is.Not.Empty);
+            
             // Assert.IsTrue(usage.Contains("xcite.clip.tests 1.0.0.0"));
-            Assert.IsTrue(usage.Contains("ReSharperTestRunner 2.6.2.69"));
+            Assert.That(usage, Contains.Substring("ReSharperTestRunner 2.11.1.102"));
             // Assert.IsTrue(usage.Contains("Copyright ©  2019"));
-            Assert.IsTrue(usage.Contains("ERROR(S)"));
-            Assert.IsTrue(usage.Contains("No verb selected."));
-            Assert.IsTrue(usage.Contains("ARGUMENT(S)"));
-            Assert.IsTrue(usage.Contains("  unpack     bla bla bla"));
-            Assert.IsTrue(usage.Contains("    copy     uhuhu"));
-            Assert.IsTrue(usage.Contains("Unknown action. Check help!"));
+            Assert.That(usage, Contains.Substring("ERROR(S)"));
+            Assert.That(usage, Contains.Substring("No verb selected."));
+            Assert.That(usage, Contains.Substring("ARGUMENT(S)"));
+            Assert.That(usage, Contains.Substring("  unpack     bla bla bla"));
+            Assert.That(usage, Contains.Substring("    copy     uhuhu"));
+            Assert.That(usage, Contains.Substring("Unknown action. Check help!"));
         }
 
         [Test]
@@ -71,22 +71,22 @@ namespace xcite.clip.tests {
                 usage = strWtr.ToString();
             }
 
-            Assert.IsNotNull(usage);
-            Assert.IsNotEmpty(usage);
-
+            Assert.That(usage, Is.Not.Null);
+            Assert.That(usage, Is.Not.Empty);
+            
             // Assert.IsTrue(usage.Contains("xcite.clip.tests 1.0.0.0"));
-            Assert.IsTrue(usage.Contains("ReSharperTestRunner 2.6.2.69"));
+            Assert.That(usage, Contains.Substring("ReSharperTestRunner 2.11.1.102"));
             // Assert.IsTrue(usage.Contains("Copyright ©  2019"));
-            Assert.IsTrue(usage.Contains("ERROR(S)"));
-            Assert.IsTrue(usage.Contains("Missing required argument."));
-            Assert.IsTrue(usage.Contains("ARGUMENT(S)"));
-            Assert.IsTrue(usage.Contains("      -f, --file     (Required) Source path"));
-            Assert.IsTrue(usage.Contains("      -d, --dest     (Required) Destination path"));
-            Assert.IsTrue(usage.Contains("  -o, --override     Override flag"));
-            Assert.IsTrue(usage.Contains("      -m, --Mode     (Default Normal) Unpack mode"));
-            Assert.IsTrue(usage.Contains("      -n, --name     (Required) Name of the machine to address"));
-            Assert.IsTrue(usage.Contains("      -p, --port     (Default 9898) Port of the machine to address"));
-            Assert.IsTrue(usage.Contains("Missing arguments. Check help!"));
+            Assert.That(usage, Contains.Substring("ERROR(S)"));
+            Assert.That(usage, Contains.Substring("Missing required argument."));
+            Assert.That(usage, Contains.Substring("ARGUMENT(S)"));
+            Assert.That(usage, Contains.Substring("      -f, --file     (Required) Source path"));
+            Assert.That(usage, Contains.Substring("      -d, --dest     (Required) Destination path"));
+            Assert.That(usage, Contains.Substring("  -o, --override     Override flag"));
+            Assert.That(usage, Contains.Substring("      -m, --Mode     (Default Normal) Unpack mode"));
+            Assert.That(usage, Contains.Substring("      -n, --name     (Required) Name of the machine to address"));
+            Assert.That(usage, Contains.Substring("      -p, --port     (Default 9898) Port of the machine to address"));
+            Assert.That(usage, Contains.Substring("Missing arguments. Check help!"));
         }
 
         [Test]
@@ -116,20 +116,20 @@ namespace xcite.clip.tests {
                 usage = strWtr.ToString();
             }
 
-            Assert.IsNotNull(usage);
-            Assert.IsNotEmpty(usage);
+            Assert.That(usage, Is.Not.Null);
+            Assert.That(usage, Is.Not.Empty);
 
             // Assert.IsTrue(usage.Contains("xcite.clip.tests 1.0.0.0"));
-            Assert.IsTrue(usage.Contains("ReSharperTestRunner 2.6.2.69"));
+            Assert.That(usage, Contains.Substring("ReSharperTestRunner 2.11.1.102"));
             // Assert.IsTrue(usage.Contains("Copyright ©  2019"));
-            Assert.IsTrue(usage.Contains("ERROR(S)"));
-            Assert.IsTrue(usage.Contains("Missing required argument."));
-            Assert.IsTrue(usage.Contains("ARGUMENT(S)"));
-            Assert.IsTrue(usage.Contains("       -x, --ex     Might do something. Don't known."));
-            Assert.IsTrue(usage.Contains("  -y, --ypsilon     (Required) This really does something. So it's heavily recommended to activate this option,"));
-            Assert.IsTrue(usage.Contains("                    so that you can see some awesome features that you would have never expected. If you have"));
-            Assert.IsTrue(usage.Contains("                    some further questions, please ask the programmer."));
-            Assert.IsTrue(usage.Contains("Missing arguments. Check help!"));
+            Assert.That(usage, Contains.Substring("ERROR(S)"));
+            Assert.That(usage, Contains.Substring("Missing required argument."));
+            Assert.That(usage, Contains.Substring("ARGUMENT(S)"));
+            Assert.That(usage, Contains.Substring("       -x, --ex     Might do something. Don't known."));
+            Assert.That(usage, Contains.Substring("  -y, --ypsilon     (Required) This really does something. So it's heavily recommended to activate this option,"));
+            Assert.That(usage, Contains.Substring("                    so that you can see some awesome features that you would have never expected. If you have"));
+            Assert.That(usage, Contains.Substring("                    some further questions, please ask the programmer."));
+            Assert.That(usage, Contains.Substring("Missing arguments. Check help!"));
         }
 
         [Test]
@@ -143,12 +143,12 @@ namespace xcite.clip.tests {
                 flipArgs = (FlipArguments) o;
             }, typeof(FlipArguments));
 
-            Assert.IsTrue(result);
-            Assert.IsNull(verb);
-
-            Assert.IsNotNull(flipArgs);
-            Assert.AreEqual(true, flipArgs.Flip);
-            Assert.AreEqual(250, flipArgs.Value);
+            Assert.That(result, Is.True);
+            Assert.That(verb, Is.Null);
+            
+            Assert.That(flipArgs, Is.Not.Null);
+            Assert.That(flipArgs.Flip, Is.True);
+            Assert.That(flipArgs.Value, Is.EqualTo(250));
         }
 
         [Test, TestCaseSource(typeof(ParseTestCaseSource))]
@@ -160,8 +160,8 @@ namespace xcite.clip.tests {
                 verb = s;
                 opts = (BaseOptions) o;
             }, typeof(UnpackOptions), typeof(CopyOptions));
-            Assert.IsTrue(result);
-            Assert.IsNotNull(verb);
+            Assert.That(result, Is.True);
+            Assert.That(verb, Is.Not.Null);
             return opts;
         }
 
