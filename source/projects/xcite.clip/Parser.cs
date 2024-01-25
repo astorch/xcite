@@ -118,7 +118,7 @@ namespace xcite.clip {
 
             if (offset >= maxChars && requiredSet.Count != 0) return PrintUsageWithError($"Missing required arguments for verb '{verb}'.", optionTypes, verbNfo);
 
-            char[] buffer = new char[300];
+            char[] buffer = new char[1024];
             int p;
             int i = offset;
             while (i != maxChars) {
