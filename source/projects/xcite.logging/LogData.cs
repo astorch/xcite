@@ -6,15 +6,15 @@ namespace xcite.logging;
 public readonly ref struct LogData(in string name, in ELogLevel level, in string value, in Exception exception) {
 
     /// <summary> Returns the log name </summary>
-    public readonly ref string name = ref name;
+    public readonly string name = name;
 
     /// <summary> Returns the log level </summary>
-    public readonly ref ELogLevel level = ref level;
+    public readonly ELogLevel level = level;
 
     /// <summary> Returns the log message </summary>
-    public readonly ref string value = ref value;
+    public readonly string value = value;
 
     /// <summary> Returns an optional exception </summary>
-    public readonly ref Exception exception = ref exception;
+    public readonly Exception exception = exception;
     
 }
