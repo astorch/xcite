@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.IO;
 using System.Text;
 
@@ -9,8 +10,9 @@ namespace xcite.logging.streams;
 /// as long open as the file stream instance exists. 
 /// </summary>
 public class FileStream : AbstractStream, FileStream._Bender {
+    private static readonly Encoding _utf8Encoding = new UTF8Encoding(false);
     private AbstractStreamWriter _streamWriter;
-
+    
     /// <inheritdoc />
     protected override void OnDispose(bool disposing) {
         ReleaseUnmanagedResources();
@@ -19,34 +21,43 @@ public class FileStream : AbstractStream, FileStream._Bender {
     }
 
     /// <summary> Name of the file the stream writes to. </summary>
-    public string FileName { get; set; }
+    public string FileName { get; init; }
 
     /// <summary>
     /// Flag to determine whether the file should be appended or overwritten.
     /// Default is TRUE.
     /// </summary>
-    public bool Append { get; set; } = true;
+    public bool Append { get; init; } = true;
 
     /// <summary> File locking model. Default is <see cref="ELockingModel.Exclusive"/>. </summary>
-    public ELockingModel LockingModel { get; set; } = ELockingModel.None;
+    public ELockingModel LockingModel { get; init; } = ELockingModel.None;
         
     /// <summary> Flag to determine to create one log file per day. </summary>
-    public bool DailyRolling { get; set; }
+    public bool DailyRolling { get; init; }
 
     /// <inheritdoc />
-    protected override void Write(string value) {
-        if (string.IsNullOrEmpty(FileName) || string.IsNullOrEmpty(value)) return;
+    protected override void OnWrite(in ReadOnlySpan<char> value, in LogData logData) {
+        if (string.IsNullOrEmpty(FileName) || value.IsEmpty) return;
             
         AbstractStreamWriter streamWriter = GetStreamWriter();
-        if (streamWriter == null) return;
-            
-        byte[] data = Encoding.UTF8.GetBytes(value);
-            
-        streamWriter.LockStream(data.Length);
+        if (streamWriter is null) return;
+
+        byte[] dataBuffer = ArrayPool<byte>.Shared.Rent(value.Length * 2);
         try {
-            streamWriter.WriteToStream(data);
+            Span<byte> dataBufferSpan = dataBuffer.AsSpan();
+            _utf8Encoding.GetBytes(value, dataBufferSpan);
+
+            int dataLength = dataBufferSpan.Length;
+            ReadOnlySpan<byte> dataSpan = dataBufferSpan[..dataLength];
+            streamWriter.LockStream(dataLength);
+            try {
+                streamWriter.WriteToStream(in dataSpan);
+            } finally {
+                streamWriter.UnlockStream(dataLength);
+            }
+            
         } finally {
-            streamWriter.UnlockStream(data.Length);
+            ArrayPool<byte>.Shared.Return(dataBuffer);
         }
     }
 
@@ -60,19 +71,28 @@ public class FileStream : AbstractStream, FileStream._Bender {
             _streamWriter = UpdateFileStream(_streamWriter);
         }
             
-        if (_streamWriter != null) return _streamWriter;
+        if (_streamWriter is not null) return _streamWriter;
 
-        if (LockingModel == ELockingModel.Exclusive)
-            _streamWriter = new ExclusiveLockingStreamWriter();
-        else if (LockingModel == ELockingModel.Minimal)
-            _streamWriter = new MinimalLockingStreamWriter();
-        else
-            _streamWriter = new NonLockingStreamWriter();
+        switch (LockingModel) {
+            case ELockingModel.Exclusive:
+                _streamWriter = new ExclusiveLockingStreamWriter();
+                break;
+            case ELockingModel.Minimal:
+                _streamWriter = new MinimalLockingStreamWriter();
+                break;
+            default:
+                _streamWriter = new NonLockingStreamWriter();
+                break;
+        }
 
         string fqFilePath = Path.GetFullPath(FileName);
         string fqFolderPath = Path.GetDirectoryName(fqFilePath);
-        if (!string.IsNullOrEmpty(fqFolderPath) && !Directory.Exists(fqFolderPath))
+        if (
+            !string.IsNullOrEmpty(fqFolderPath)
+            && !Directory.Exists(fqFolderPath)
+        ) {
             Directory.CreateDirectory(fqFolderPath);
+        }
             
         _streamWriter.InitStream(FileName, Append);
         return _streamWriter;
@@ -87,16 +107,16 @@ public class FileStream : AbstractStream, FileStream._Bender {
     /// </summary>
     protected virtual AbstractStreamWriter UpdateFileStream(AbstractStreamWriter currentStream) {
         // No stream, nothing to check
-        if (currentStream == null) return null;
+        if (currentStream is null) return null;
 
         // When nothing has been written to the stream yet, there is nothing to check
-        if (currentStream.lastWrite == default) return currentStream;
+        if (currentStream.LastWrite == default) return currentStream;
 
         // When the day hasn't changed yet, there is nothing to do
-        if (currentStream.lastWrite.Day == DateTime.Today.Day) return currentStream;
+        if (currentStream.LastWrite.Day == DateTime.Today.Day) return currentStream;
             
         // Close stream
-        DateTime lastWriteDay = currentStream.lastWrite;
+        DateTime lastWriteDay = currentStream.LastWrite;
         currentStream.Dispose();
             
         // Calculate new file name
@@ -105,8 +125,8 @@ public class FileStream : AbstractStream, FileStream._Bender {
         string day = lastWriteDay.Day.ToString("00");
 
         int extIdx = FileName.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase);
-        string fnm = FileName.Substring(0, extIdx);
-        string ext = FileName.Substring(extIdx);
+        string fnm = FileName[..extIdx];
+        string ext = FileName[extIdx..];
         string mvFn = $"{fnm}-{year}-{month}-{day}{ext}";
             
         // Renamed existing file
@@ -125,17 +145,43 @@ public class FileStream : AbstractStream, FileStream._Bender {
     }
 
     /// <inheritdoc />
-    void _Bender.SetLastWrite(DateTime value) {
-        if (_streamWriter == null) return;
-        _streamWriter.lastWrite = value;
-    }
+    void _Bender.SetLastWrite(DateTime value)
+        => _streamWriter?.LastWrite = value;
 
     /// <summary> Defines a locking model aware file stream writer.
     /// </summary>
     protected abstract class AbstractStreamWriter : IDisposable {
+        private bool _disposed;
         private System.IO.FileStream _fileStream;
-        public DateTime lastWrite;
-            
+
+        /// <inheritdoc />
+        ~AbstractStreamWriter() {
+            Dispose(false);
+        }
+        
+        /// <inheritdoc />
+        public void Dispose() {
+            OnDispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary> Notifies the instance that is is being disposed. </summary>
+        protected void Dispose(bool disposing) {
+            if (_disposed) return;
+            _disposed = true;
+            OnDispose(disposing);
+        }
+
+        /// <summary> Is invoked when this instance is being disposed. </summary>
+        protected virtual void OnDispose(bool disposing) {
+            _fileStream?.Flush();
+            _fileStream?.Dispose();
+            _fileStream = null;
+        }
+
+        /// <summary> Instant of time this stream has been written to last. </summary>
+        public DateTime LastWrite { get; internal set; }
+        
         /// <summary>
         /// Initializes a file stream with the specified <paramref name="fileName"/>.
         /// If <paramref name="append"/> is FALSE, a new file is always created and an
@@ -156,10 +202,10 @@ public class FileStream : AbstractStream, FileStream._Bender {
             => OnLockStream(_fileStream, size);
 
         /// <summary> Writes the given <paramref name="data"/> to the underlying stream. </summary>
-        public virtual void WriteToStream(byte[] data) {
-            _fileStream.Write(data, 0, data.Length);
-            _fileStream.Flush();
-            lastWrite = DateTime.Today;
+        public virtual void WriteToStream(in ReadOnlySpan<byte> data) {
+            _fileStream.Write(data);
+            // _fileStream.Flush(); // Do not immediately flush to reduce pressure to disk
+            LastWrite = DateTime.Now;
         }
 
         /// <summary>
@@ -168,12 +214,6 @@ public class FileStream : AbstractStream, FileStream._Bender {
         /// </summary>
         public virtual void UnlockStream(int size) 
             => OnUnlockStream(_fileStream, size);
-
-        /// <inheritdoc />
-        public virtual void Dispose() {
-            _fileStream?.Dispose();
-            _fileStream = null;
-        }
 
         /// <summary>
         /// Is invoked when <see cref="InitStream"/> is called. Sub-classes
