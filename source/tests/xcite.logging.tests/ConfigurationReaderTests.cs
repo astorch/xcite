@@ -18,18 +18,18 @@ public class ConfigurationReaderTests {
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
             
         // Assert
-        Assert.IsNotNull(lgCfg);
-        Assert.AreEqual(ELogLevel.Debug, lgCfg.Level);
-        Assert.AreEqual("%date %level %text%nl", lgCfg.Pattern);
-            
-        Assert.AreEqual(2, lgCfg.Streams.Length);
-            
+        Assert.That(lgCfg, Is.Not.Null);
+        Assert.That(lgCfg.Level, Is.EqualTo(ELogLevel.Debug));
+        Assert.That(lgCfg.Pattern, Is.EqualTo("%date %level %text%nl"));
+        
+        Assert.That(lgCfg.Streams, Has.Length.EqualTo(2));    
+        
         ILogStream consoleStream = lgCfg.Streams[0];
-        Assert.AreEqual(typeof(ConsoleStream), consoleStream.GetType());
-
+        Assert.That(consoleStream, Is.TypeOf<ConsoleStream>());
+        
         ILogStream fileStream = lgCfg.Streams[1];
-        Assert.AreEqual(typeof(FileStream), fileStream.GetType());
-        Assert.AreEqual("_lfc.txt", ((FileStream) fileStream).FileName);
+        Assert.That(fileStream, Is.TypeOf<FileStream>());
+        Assert.That(((FileStream) fileStream).FileName, Is.EqualTo("_lfc.txt"));
     }
 
     [Test]
@@ -41,20 +41,21 @@ public class ConfigurationReaderTests {
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
             
         // Assert
-        Assert.IsNotNull(lgCfg);
-        Assert.AreEqual(ELogLevel.Debug, lgCfg.Level);
-        Assert.AreEqual("%date %level %text%nl", lgCfg.Pattern);
-            
-        Assert.AreEqual(2, lgCfg.Streams.Length);
-            
+        Assert.That(lgCfg, Is.Not.Null);
+        Assert.That(lgCfg.Level, Is.EqualTo(ELogLevel.Debug));
+        Assert.That(lgCfg.Pattern, Is.EqualTo("%date %level %text%nl"));
+        
+        Assert.That(lgCfg.Streams, Has.Length.EqualTo(2));    
+        
         ILogStream consoleStream = lgCfg.Streams[0];
-        Assert.AreEqual(typeof(ConsoleStream), consoleStream.GetType());
-
+        Assert.That(consoleStream, Is.TypeOf<ConsoleStream>());
+        
         ILogStream fileStream = lgCfg.Streams[1];
-        Assert.AreEqual(typeof(FileStream), fileStream.GetType());
-        Assert.AreEqual("_lfc2.txt", ((FileStream) fileStream).FileName);
-        Assert.AreEqual(true, ((FileStream) fileStream).Append);
-        Assert.AreEqual(ELockingModel.Minimal, ((FileStream) fileStream).LockingModel);
+        Assert.That(fileStream, Is.TypeOf<FileStream>());
+        Assert.That(((FileStream) fileStream).FileName, Is.EqualTo("_lfc2.txt"));
+        
+        Assert.That(((FileStream) fileStream).Append, Is.True);
+        Assert.That(((FileStream) fileStream).LockingModel, Is.EqualTo(ELockingModel.Minimal));
     }
 
     [Test]
@@ -66,20 +67,20 @@ public class ConfigurationReaderTests {
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
             
         // Assert
-        Assert.IsNotNull(lgCfg);
-        Assert.AreEqual(ELogLevel.Debug, lgCfg.Level);
-        Assert.AreEqual("%date(dd.MM.yyyy HH:mm:ss:fff) %level %text%nl", lgCfg.Pattern);
-            
-        Assert.AreEqual(3, lgCfg.Streams.Length);
-            
+        Assert.That(lgCfg, Is.Not.Null);
+        Assert.That(lgCfg.Level, Is.EqualTo(ELogLevel.Debug));
+        Assert.That(lgCfg.Pattern, Is.EqualTo("%date(dd.MM.yyyy HH:mm:ss:fff) %level %text%nl"));
+        
+        Assert.That(lgCfg.Streams, Has.Length.EqualTo(3));
+        
         ILogStream debugStream = lgCfg.Streams[0];
-        Assert.AreEqual(typeof(DebugStream), debugStream.GetType());
-            
+        Assert.That(debugStream, Is.TypeOf<DebugStream>());
+        
         ILogStream consoleStream = lgCfg.Streams[1];
-        Assert.AreEqual(typeof(ConsoleStream), consoleStream.GetType());
-            
+        Assert.That(consoleStream, Is.TypeOf<ConsoleStream>());
+        
         ILogStream fileStream = lgCfg.Streams[2];
-        Assert.AreEqual(typeof(FileStream), fileStream.GetType());
+        Assert.That(fileStream, Is.TypeOf<FileStream>());
     }
         
     [Test]
@@ -91,17 +92,17 @@ public class ConfigurationReaderTests {
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
             
         // Assert
-        Assert.IsNotNull(lgCfg);
-        Assert.AreEqual(ELogLevel.Debug, lgCfg.Level);
-        Assert.AreEqual("%date %level %text%nl", lgCfg.Pattern);
-            
-        Assert.AreEqual(2, lgCfg.Streams.Length);
-            
+        Assert.That(lgCfg, Is.Not.Null);
+        Assert.That(lgCfg.Level, Is.EqualTo(ELogLevel.Debug));
+        Assert.That(lgCfg.Pattern, Is.EqualTo("%date %level %text%nl"));
+        
+        Assert.That(lgCfg.Streams, Has.Length.EqualTo(2));    
+        
         ILogStream customStream = lgCfg.Streams[0];
-        Assert.AreEqual(typeof(ConsoleStream), customStream.GetType());
-
+        Assert.That(customStream, Is.TypeOf<ConsoleStream>());
+        
         ILogStream hiddenStream = lgCfg.Streams[1];
-        Assert.AreEqual(typeof(HiddenStream), hiddenStream.GetType());
+        Assert.That(hiddenStream, Is.TypeOf<HiddenStream>());
     }
         
     [Test]
@@ -113,15 +114,15 @@ public class ConfigurationReaderTests {
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
             
         // Assert
-        Assert.IsNotNull(lgCfg);
-        Assert.AreEqual(ELogLevel.Debug, lgCfg.Level);
-        Assert.AreEqual("%date %level %text%nl", lgCfg.Pattern);
-            
-        Assert.AreEqual(1, lgCfg.Streams.Length);
-            
+        Assert.That(lgCfg, Is.Not.Null);
+        Assert.That(lgCfg.Level, Is.EqualTo(ELogLevel.Debug));
+        Assert.That(lgCfg.Pattern, Is.EqualTo("%date %level %text%nl"));
+        
+        Assert.That(lgCfg.Streams, Has.Length.EqualTo(1));    
+        
         ILogStream stream = lgCfg.Streams[0];
             
-        Assert.IsTrue(stream is AbstractStream);
+        Assert.That(stream is AbstractStream);
         Assert.That(((AbstractStream)stream).Types, Is.EqualTo(["foo", "bar"]).AsCollection);
     }
 
@@ -134,9 +135,9 @@ public class ConfigurationReaderTests {
         LogManager.Configuration =  ConfigurationReader.ReadFile(logCfgFn, false);
             
         // Assert
-        Assert.AreEqual(ELogLevel.Debug, LogManager.Configuration.Level);
-        Assert.AreEqual("%date %level %text%nl", LogManager.Configuration.Pattern);
-        Assert.AreEqual(2, LogManager.Configuration.Streams.Length);
+        Assert.That(LogManager.Configuration.Level, Is.EqualTo(ELogLevel.Debug));
+        Assert.That(LogManager.Configuration.Pattern, Is.EqualTo("%date %level %text%nl"));
+        Assert.That(LogManager.Configuration.Streams, Has.Length.EqualTo(2));
     }
 
     [Test]
