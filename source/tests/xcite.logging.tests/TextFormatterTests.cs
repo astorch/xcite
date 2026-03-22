@@ -97,7 +97,7 @@ public class TextFormatterTests {
                           $"time {sw.ElapsedMilliseconds.ToString()}, " +
                           $"avg {(sw.ElapsedMilliseconds / (double) itrCount).ToString()}");
             
-        Assert.IsTrue(sw.ElapsedMilliseconds < 10);
+        Assert.That(sw.ElapsedMilliseconds < 10);
     }
 
     [Test]
@@ -130,8 +130,8 @@ public class TextFormatterTests {
             
         // Assert
         int threadId = Thread.CurrentThread.ManagedThreadId;
-        Assert.AreEqual($"TRACE {timestamp} [{threadId}] Almoner - This is a message\n", value1);
-        Assert.AreEqual(value1, value2);
+        Assert.That(value1, Is.EqualTo($"TRACE {timestamp} [{threadId}] Almoner - This is a message\n"));
+        Assert.That(value2, Is.EqualTo(value1));
     }
     
 }
