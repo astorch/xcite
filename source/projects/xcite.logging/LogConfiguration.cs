@@ -7,7 +7,7 @@ public delegate void LogConfigurationChangedHandler(LogConfiguration sender);
     
 /// <summary> Describes the logging configuration. </summary>
 public class LogConfiguration {
-    private readonly List<ILogStream> _logStreams = new List<ILogStream>(10);
+    private readonly List<ILogStream> _logStreams = new(10);
 
     /// <summary> Initializes the new instance </summary>
     public LogConfiguration() {
@@ -49,13 +49,12 @@ public class LogConfiguration {
 
     /// <summary> Adds the specified type of <typeparamref name="TStream"/> to the configuration. </summary>
     /// <typeparam name="TStream">Type of stream to add</typeparam>
-    public LogConfiguration AddStream<TStream>() where TStream : class, ILogStream, new() {
-        return AddStream(new TStream());
-    }
+    public LogConfiguration AddStream<TStream>() where TStream : class, ILogStream, new()
+        => AddStream(new TStream());
 
     /// <summary> Adds the given <paramref name="logStream"/> instance to the configuration. </summary>
     public LogConfiguration AddStream(ILogStream logStream) {
-        if (logStream == null) return this;
+        if (logStream is null) return this;
             
         _logStreams.Add(logStream);
         StreamsChanged?.Invoke(this);
@@ -66,9 +65,10 @@ public class LogConfiguration {
     public LogConfiguration Reset() {
         Pattern = LogPatterns.Standard;
         Level = ELogLevel.Info;
-            
-        for (int i = -1; ++i != _logStreams.Count;)
+
+        for (int i = -1, ilen = _logStreams.Count; ++i != ilen;) {
             _logStreams[i].Dispose();
+        }
             
         _logStreams.Clear();
         return this;
