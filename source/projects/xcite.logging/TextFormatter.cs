@@ -168,7 +168,7 @@ public class TextFormatter {
 
     /// <summary> Plots a newline string. </summary>
     private static void PlotNewline(in string _, in LogData logData, in IBufferWriter<char> bufferWriter)
-        => bufferWriter.Write(" ");
+        => bufferWriter.Write("\n");
 
     /// <summary> Plots the log data value. </summary>
     private static void PlotText(in string _, in LogData logData, in IBufferWriter<char> bufferWriter)
