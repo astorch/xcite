@@ -10,6 +10,6 @@ public interface ILogStream : IDisposable {
     /// The argument <paramref name="logData"/> provides additional information
     /// about the value to write.
     /// </summary>
-    void Write(string value, LogData logData);
+    void Write(in string value, in LogData logData);
         
 }
