@@ -5,10 +5,10 @@ namespace xcite.logging;
 
 /// <summary> Provides access to all available instance of <see cref="ILogStream"/>. </summary>
 public static class StreamStore {
-    private static readonly Type[] _streamTypes = {
+    private static readonly Type[] _streamTypes = [
         typeof(ConsoleStream), typeof(DebugStream), typeof(FileStream),
         typeof(TraceStream)
-    };
+    ];
         
     /// <summary>
     /// Loads the <see cref="ILogStream"/> instance specified by <paramref name="name"/>.
