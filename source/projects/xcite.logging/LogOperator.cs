@@ -14,11 +14,11 @@ public class LogOperator(LogConfiguration config, TextFormatter textFormatter) {
         if (!logData.level.IsGreaterOrEqual(_thresholdLevel)) return;
             
         // Maybe a recyclable memory stream is faster?
-        using ArrayPoolBufferWriter<byte> bufferWriter = new(1024); // Should be sufficent for the very most cases
+        using ArrayPoolBufferWriter<char> bufferWriter = new(1024); // Should be sufficent for the very most cases
         
         textFormatter.FormatValue(in _logPattern, in logData, bufferWriter);
 
-        ReadOnlySpan<byte> writtenSpan = bufferWriter.WrittenSpan;
+        ReadOnlySpan<char> writtenSpan = bufferWriter.WrittenSpan;
         for (int i = -1, ilen = _logStreams.Length; ++i != ilen;) {
             _logStreams[i].Write(in writtenSpan, in logData);
         }
@@ -31,7 +31,7 @@ public class LogOperator(LogConfiguration config, TextFormatter textFormatter) {
         bufferWriter.Clear();
         textFormatter.FormatValue(in _logPattern, in exLgDt, bufferWriter);
 
-        ReadOnlySpan<byte> exWrittenSpan = bufferWriter.WrittenSpan;
+        ReadOnlySpan<char> exWrittenSpan = bufferWriter.WrittenSpan;
         for (int i = -1, ilen = _logStreams.Length; ++i != ilen;) {
             _logStreams[i].Write(in exWrittenSpan, in exLgDt);
         }

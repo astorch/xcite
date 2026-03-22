@@ -3,7 +3,6 @@ using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace xcite.logging;
@@ -11,24 +10,19 @@ namespace xcite.logging;
 /// <summary> Formats log records based on a specified pattern. </summary>
 public class TextFormatter {
 
-    private readonly FrozenDictionary<string, Plot> _standardPlotter;
+    private static readonly FrozenDictionary<string, Plot> _standardPlotter = new Dictionary<string, Plot>(6) {
+        { "level",  PlotLogLevel},
+        { "date",   PlotDate},
+        { "name",   PlotLogName},
+        { "text",   PlotText},
+        { "nl",     PlotNewline},
+        { "thread", PlotThread}
+    }.ToFrozenDictionary();
+    
     private readonly ConcurrentDictionary<string, IReadOnlyList<PlotPeer>> _plotSequences = new();
-    private readonly Encoding _encoding = new UTF8Encoding(false);
-
-    /// <summary> Initializes the new instance </summary>
-    public TextFormatter() {
-        _standardPlotter = new Dictionary<string, Plot>(6) {
-            { "level",  PlotLogLevel},
-            { "date",   PlotDate},
-            { "name",   PlotLogName},
-            { "text",   PlotText},
-            { "nl",     PlotNewline},
-            { "thread", PlotThread}
-        }.ToFrozenDictionary();
-    }
 
     /// <summary> Formats the given <paramref name="logData"/> using the specified <paramref name="pattern"/>. </summary>
-    public void FormatValue(in string pattern, in LogData logData, in IBufferWriter<byte> bufferWriter) {
+    public void FormatValue(in string pattern, in LogData logData, in IBufferWriter<char> bufferWriter) {
         foreach (PlotPeer plotPeer in ToPlotPeerSequence(in pattern)) {
             plotPeer(in logData, in bufferWriter);
         }
@@ -38,11 +32,11 @@ public class TextFormatter {
     private IReadOnlyList<PlotPeer> ToPlotPeerSequence(in string pattern)
         => _plotSequences.GetOrAdd(
             pattern,
-            pttrn => BuildPlotSequence(in pttrn) 
+            static pttrn => BuildPlotSequence(in pttrn) 
         );
 
     /// <summary> Builds a sequence of plot peers for that <paramref name="pattern"/>. </summary>
-    private IReadOnlyList<PlotPeer> BuildPlotSequence(in string pattern) {
+    private static IReadOnlyList<PlotPeer> BuildPlotSequence(in string pattern) {
         if (string.IsNullOrWhiteSpace(pattern)) return [];
 
         List<PlotPeer> plotSequence = new(16);
@@ -63,7 +57,7 @@ public class TextFormatter {
 
                 if (p != 0) {
                     string fillData = new(buffer);
-                    PlotPeer plotFill = (in _, in writer) => _encoding.GetBytes(fillData, writer);
+                    PlotPeer plotFill = (in _, in writer) => writer.Write(fillData);
                     plotSequence.Add(plotFill);
                     
                     buffer.Clear();
@@ -84,7 +78,7 @@ public class TextFormatter {
 
         if (p != 0) {
             string fillData = new(buffer);
-            PlotPeer plotFill = (in _, in writer) => _encoding.GetBytes(fillData, writer);
+            PlotPeer plotFill = (in _, in writer) => writer.Write(fillData);
             plotSequence.Add(plotFill);
                     
             // No clean-up here
@@ -98,7 +92,7 @@ public class TextFormatter {
     /// If there isn't a registered plotter, a default plotter that writes an empty string
     /// is returned.
     /// </summary>
-    private PlotPeer GetPlotPeer(string plotName, string plotArg) {
+    private static PlotPeer GetPlotPeer(string plotName, string plotArg) {
         Plot basePlot = _standardPlotter.TryGetValue(plotName, out Plot plot) ? plot : PlotNull;
         return (in logData, in bufferWriter) => basePlot(in plotArg, in logData, in bufferWriter);
     }
@@ -145,17 +139,17 @@ public class TextFormatter {
     }
 
     
-    private delegate void PlotPeer(in LogData logData, in IBufferWriter<byte> bufferWriter);
+    private delegate void PlotPeer(in LogData logData, in IBufferWriter<char> bufferWriter);
     
-    private delegate void Plot(in string arg, in LogData logData, in IBufferWriter<byte> bufferWriter);
+    private delegate void Plot(in string arg, in LogData logData, in IBufferWriter<char> bufferWriter);
     
     /// <summary> Plots nothing. </summary>
-    private static void PlotNull(in string arg, in LogData logData, in IBufferWriter<byte> bufferWriter) {
+    private static void PlotNull(in string arg, in LogData logData, in IBufferWriter<char> bufferWriter) {
         // Do nothing
     }
 
     /// <summary> Plots the thread information based on the specified <paramref name="arg"/>. </summary>
-    private void PlotThread(in string arg, in LogData logData, in IBufferWriter<byte> bufferWriter) {
+    private static void PlotThread(in string arg, in LogData logData, in IBufferWriter<char> bufferWriter) {
         Thread thread = Thread.CurrentThread;
         string txt = arg switch {
             null => thread.ManagedThreadId.ToString(),
@@ -163,25 +157,25 @@ public class TextFormatter {
             _ => thread.ManagedThreadId.ToString()
         };
 
-        _encoding.GetBytes(txt, bufferWriter);
+        bufferWriter.Write(txt);
     }
 
     /// <summary> Plots a newline string. </summary>
-    private static void PlotNewline(in string _, in LogData logData, in IBufferWriter<byte> bufferWriter)
-        => bufferWriter.Write("\n"u8);
+    private static void PlotNewline(in string _, in LogData logData, in IBufferWriter<char> bufferWriter)
+        => bufferWriter.Write(" ");
 
     /// <summary> Plots the log data value. </summary>
-    private void PlotText(in string _, in LogData logData, in IBufferWriter<byte> bufferWriter)
-        => _encoding.GetBytes(logData.value, bufferWriter);
+    private static void PlotText(in string _, in LogData logData, in IBufferWriter<char> bufferWriter)
+        => bufferWriter.Write(logData.value);
 
     /// <summary> Plots the name of the log based on the specified <paramref name="format"/>. </summary>
-    private void PlotLogName(in string format, in LogData logData, in IBufferWriter<byte> bufferWriter) {
+    private static void PlotLogName(in string format, in LogData logData, in IBufferWriter<char> bufferWriter) {
         string logName = logData.name;
         int dotTkIdx = logName.LastIndexOf('.');
             
         // No qualified class name
         if (dotTkIdx == -1) {
-            _encoding.GetBytes(logName, bufferWriter);
+            bufferWriter.Write(logName);
             return;
         }
 
@@ -189,26 +183,26 @@ public class TextFormatter {
             
         // No format specified, so we take the simple name as default
         if (string.IsNullOrEmpty(format)) {
-            _encoding.GetBytes(simpleName, bufferWriter);
+            bufferWriter.Write(simpleName);
             return;
         }
 
         // Explicitly full qualified requested
         if (format == "fq") {
-            _encoding.GetBytes(logName, bufferWriter);
+            bufferWriter.Write(logName);
             return;
         }
 
         // Any other cases
-        _encoding.GetBytes(simpleName, bufferWriter);
+        bufferWriter.Write(simpleName);
     }
 
     /// <summary> Plots the current log level. </summary>
-    private void PlotLogLevel(in string arg, in LogData data, in IBufferWriter<byte> bufferWriter)
-        => _encoding.GetBytes(data.level.ToString(), bufferWriter);
+    private static void PlotLogLevel(in string arg, in LogData data, in IBufferWriter<char> bufferWriter)
+        => bufferWriter.Write(data.level.ToString());
 
     /// <summary> Plots the current timestamp with the specified <paramref name="format"/>. </summary>
-    private void PlotDate(in string format, in LogData _, in IBufferWriter<byte> bufferWriter)
-        => _encoding.GetBytes(DateTime.Now.ToString(format), bufferWriter);
-    
+    private static void PlotDate(in string format, in LogData _, in IBufferWriter<char> bufferWriter)
+        => bufferWriter.Write(DateTime.Now.ToString(format));
+
 }
