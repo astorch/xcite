@@ -7,7 +7,7 @@
     <Title>xcite.logging</Title>
     <Company>Arian Storch</Company>
     <Authors>Arian Storch, Philippe Barias</Authors>
-    <Description>A simple and fast .NET Standard logging library.</Description>
+    <Description>A simple and fast .NET logging library</Description>
     <RepositoryType>git</RepositoryType>
     <PackageTags>xcite logging</PackageTags>
     <Copyright>© 2018 - 2026 Arian Storch. All rights reserved.</Copyright>
