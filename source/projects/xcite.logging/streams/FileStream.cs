@@ -46,9 +46,8 @@ public class FileStream : AbstractStream, FileStream._Bender {
         byte[] dataBuffer = ArrayPool<byte>.Shared.Rent(value.Length * 2);
         try {
             Span<byte> dataBufferSpan = dataBuffer.AsSpan();
-            _utf8Encoding.GetBytes(value, dataBufferSpan);
+            int dataLength = _utf8Encoding.GetBytes(value, dataBufferSpan);
 
-            int dataLength = dataBufferSpan.Length;
             ReadOnlySpan<byte> dataSpan = dataBufferSpan[..dataLength];
             
             streamWriter.LockStream(dataLength);
