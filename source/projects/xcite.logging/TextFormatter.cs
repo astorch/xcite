@@ -44,10 +44,13 @@ public class TextFormatter {
         // "%level %date(dd.MM.yyyy HH:mm:ss) [%thread] %name - %text%nl"
 
         Span<char> buffer = stackalloc char[64];
-        int p = 0;
+        int q = 0;
 
         Span<char> plotNameBuffer = stackalloc char[64];
+        int p1 = 0;
+        
         Span<char> plotArgBuffer = stackalloc char[256];
+        int p2 = 0;
         
         ReadOnlySpan<char> patternChars = pattern.AsSpan();
         for (int i = -1; ++i != patternChars.Length;) {
@@ -55,29 +58,34 @@ public class TextFormatter {
 
             if (c == '%') {
 
-                if (p != 0) {
-                    string fillData = new(buffer);
+                if (q != 0) {
+                    string fillData = new(buffer[..q]);
                     PlotPeer plotFill = (in _, in writer) => writer.Write(fillData);
                     plotSequence.Add(plotFill);
                     
-                    buffer.Clear();
-                    p = 0;
+                    q = 0;
                 }
+
+                p1 = 0;
+                p2 = 0;
                 
-                plotNameBuffer.Clear();
-                plotArgBuffer.Clear();
+                ReadPlotSegment(
+                    in patternChars, ref i, 
+                    in plotNameBuffer, ref p1, 
+                    in plotArgBuffer, ref p2
+                );
                 
-                ReadPlotSegment(in patternChars, ref i, in plotNameBuffer, plotArgBuffer);
-                
-                plotSequence.Add(GetPlotPeer(new string(plotNameBuffer), new string(plotArgBuffer)));
+                plotSequence.Add(GetPlotPeer(new string(plotNameBuffer[..p1]), new string(plotArgBuffer[..p2])));
+
+                i--;
                 continue;
             }
 
-            buffer[p++] = c;
+            buffer[q++] = c;
         }
 
-        if (p != 0) {
-            string fillData = new(buffer);
+        if (q != 0) {
+            string fillData = new(buffer[..q]);
             PlotPeer plotFill = (in _, in writer) => writer.Write(fillData);
             plotSequence.Add(plotFill);
                     
@@ -104,12 +112,10 @@ public class TextFormatter {
     /// </summary>
     private static void ReadPlotSegment(
         in ReadOnlySpan<char> patternChars, ref int i, 
-        in Span<char> plotNameBuffer, in Span<char> plotArgBuffer
+        in Span<char> plotNameBuffer, ref int p1,
+        in Span<char> plotArgBuffer, ref int p2
     ) {
         bool argMode = false;
-
-        int p1 = 0;
-        int p2 = 0;
         for (int ilen = patternChars.Length; ++i != ilen;) {
             char c = patternChars[i];
 
