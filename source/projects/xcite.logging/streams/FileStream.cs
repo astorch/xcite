@@ -239,7 +239,8 @@ public class FileStream : AbstractStream, FileStream._Bender {
     /// Implementation of <see cref="AbstractStreamWriter"/> that does not acquire
     /// a lock for the log file. Other processes can always read the file.
     /// </summary>
-    private class NonLockingStreamWriter : AbstractStreamWriter {
+    sealed class NonLockingStreamWriter : AbstractStreamWriter {
+        
         /// <inheritdoc />
         protected override System.IO.FileStream OnInitStream(string fileName, FileMode fileMode) {
             return new System.IO.FileStream(fileName, fileMode, FileAccess.Write, FileShare.ReadWrite);
@@ -254,6 +255,7 @@ public class FileStream : AbstractStream, FileStream._Bender {
         protected override void OnUnlockStream(System.IO.FileStream fileStream, int size) {
             // No unlock
         }
+        
     }
         
     /// <summary>
@@ -261,7 +263,8 @@ public class FileStream : AbstractStream, FileStream._Bender {
     /// a lock for the log file in the moment of writing. Other processes can
     /// mostly read the log file.
     /// </summary>
-    class MinimalLockingStreamWriter : AbstractStreamWriter {
+    sealed class MinimalLockingStreamWriter : AbstractStreamWriter {
+        
         /// <inheritdoc />
         protected override System.IO.FileStream OnInitStream(string fileName, FileMode fileMode) {
             return new System.IO.FileStream(fileName, fileMode, FileAccess.Write, FileShare.Read);
@@ -276,6 +279,7 @@ public class FileStream : AbstractStream, FileStream._Bender {
         protected override void OnUnlockStream(System.IO.FileStream fileStream, int size) {
             // No additional lock required
         }
+        
     }
 
     /// <summary>
@@ -283,7 +287,8 @@ public class FileStream : AbstractStream, FileStream._Bender {
     /// an exclusive lock for the log file. No other process can read or
     /// write to that file.
     /// </summary>
-    class ExclusiveLockingStreamWriter : AbstractStreamWriter {
+    sealed class ExclusiveLockingStreamWriter : AbstractStreamWriter {
+        
         /// <inheritdoc />
         protected override System.IO.FileStream OnInitStream(string fileName, FileMode fileMode) {
             return new System.IO.FileStream(fileName, fileMode, FileAccess.Write, FileShare.None);
@@ -298,12 +303,16 @@ public class FileStream : AbstractStream, FileStream._Bender {
         protected override void OnUnlockStream(System.IO.FileStream fileStream, int size) {
             // No additional unlock required
         }
+        
     }
         
     /// <summary> Interface for internal usage </summary>
     // ReSharper disable once InconsistentNaming
-    public interface _Bender {
+    internal interface _Bender {
+        
         /// <summary> Sets the last write instant to the given <paramref name="value"/>. </summary>
         void SetLastWrite(DateTime value);
+        
     }
+    
 }
