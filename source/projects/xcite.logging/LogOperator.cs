@@ -1,39 +1,40 @@
+using System;
+using CommunityToolkit.HighPerformance.Buffers;
+
 namespace xcite.logging;
 
 /// <summary> Implements the log stream writing based on the current configuration. </summary>
-public class LogOperator {
-    private readonly LogConfiguration _config;
-    private readonly TextFormatter _textFormatter;
-    private readonly LogStreamManager _streamManager;
-
-    /// <summary> Initializes the new instance with the specified arguments. </summary>
-    public LogOperator(LogConfiguration config, TextFormatter textFormatter, LogStreamManager streamManager) { 
-        _config = config;
-        _textFormatter = textFormatter;
-        _streamManager = streamManager;
-    }
-
+public class LogOperator(LogConfiguration config, TextFormatter textFormatter) {
+    private readonly ELogLevel _thresholdLevel = config.Level;
+    private readonly string _logPattern = config.Pattern;
+    private readonly ILogStream[] _logStreams = config.Streams;
+    
     /// <summary> Writes the given <paramref name="logData"/> to all registered log streams. </summary>
-    public void Write(LogData logData) {
-        ELogLevel logLevel = _config.Level;
-        if (!logData.level.IsGreaterOrEqual(logLevel)) return;
+    public void Write(in LogData logData) {
+        if (!logData.level.IsGreaterOrEqual(_thresholdLevel)) return;
             
-        string pattern = _config.Pattern;
-        ILogStream[] logStreams = _config.Streams;
-            
-        string record = _textFormatter.FormatValue(pattern, logData);
-        _streamManager.Write(logStreams, logData, record);
+        // Maybe a recyclable memory stream is faster?
+        using ArrayPoolBufferWriter<byte> bufferWriter = new(1024); // Should be sufficent for the very most cases
+        
+        textFormatter.FormatValue(in _logPattern, in logData, bufferWriter);
 
-        if (logData.exception == null) return;
-            
-        LogData exLgDt = new LogData {
-            name = logData.name, level = logData.level,
-            value = logData.exception.ToString(),
-            exception = logData.exception
-        };
+        ReadOnlySpan<byte> writtenSpan = bufferWriter.WrittenSpan;
+        for (int i = -1, ilen = _logStreams.Length; ++i != ilen;) {
+            _logStreams[i].Write(in writtenSpan, in logData);
+        }
 
-        string exRec = _textFormatter.FormatValue(pattern, exLgDt);
-        _streamManager.Write(logStreams, exLgDt, exRec);
+        if (logData.exception is null) return;
+
+        string exceptionMessage = logData.exception.ToString();
+        LogData exLgDt = new(in logData.name, in logData.level, in exceptionMessage, in logData.exception);
+
+        bufferWriter.Clear();
+        textFormatter.FormatValue(in _logPattern, in exLgDt, bufferWriter);
+
+        ReadOnlySpan<byte> exWrittenSpan = bufferWriter.WrittenSpan;
+        for (int i = -1, ilen = _logStreams.Length; ++i != ilen;) {
+            _logStreams[i].Write(in exWrittenSpan, in exLgDt);
+        }
     }
         
 }

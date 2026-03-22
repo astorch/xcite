@@ -8,7 +8,7 @@ namespace xcite.logging;
 public static class LogManager {
     private static readonly ConcurrentDictionary<string, Log> _logRepository = new();
     private static readonly LogConfiguration _config = new();
-    private static readonly LogOperator _logOperator = new(_config, new TextFormatter(), new LogStreamManager());
+    private static readonly LogOperator _logOperator = new(_config, new TextFormatter());
 
     /// <summary> Log configuration </summary>
     public static LogConfiguration Configuration {
