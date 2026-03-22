@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,7 +7,7 @@ namespace xcite.logging.streams;
 
 /// <summary> The <see cref="AbstractStream"/> implements functionality used by all other streams. </summary>
 public abstract class AbstractStream : ILogStream {
-    private readonly HashSet<string> _servedTypes = [];
+    private FrozenSet<string> _servedTypes = [];
     private bool _disposed;
     private bool _serveTypes;
         
@@ -25,21 +26,18 @@ public abstract class AbstractStream : ILogStream {
 
         set {
             _serveTypes = false;
-            _servedTypes.Clear();
+            _servedTypes = []; 
             if (value is null || value.Length == 0) return;
 
-            for (int i = -1, ilen = value.Length; ++i != ilen;) {
-                _servedTypes.Add(value[i]);
-            }
-
+            _servedTypes = new HashSet<string>(value).ToFrozenSet();
             _serveTypes = _servedTypes.Count != 0;
         }
     }
 
     /// <inheritdoc />
-    public virtual void Write(in ReadOnlySpan<byte> value, in LogData logData) {
+    public virtual void Write(in ReadOnlySpan<char> value, in LogData logData) {
         if (!_serveTypes || _servedTypes.Contains(logData.name)) {
-            Write(in value);
+            OnWrite(in value, in logData);
         }
     }
 
@@ -61,6 +59,6 @@ public abstract class AbstractStream : ILogStream {
     protected abstract void OnDispose(bool disposing);
 
     /// <summary> Writes the specified <paramref name="value"/> into the stream. </summary>
-    protected abstract void Write(in ReadOnlySpan<byte> value);
+    protected abstract void OnWrite(in ReadOnlySpan<char> value, in LogData logData);
         
 }
