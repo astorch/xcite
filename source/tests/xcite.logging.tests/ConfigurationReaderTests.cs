@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using NUnit.Framework;
 using xcite.logging.streams;
@@ -7,10 +8,11 @@ namespace xcite.logging.tests;
 
 [TestFixture]
 public class ConfigurationReaderTests {
+    
     [Test]
     public void ReadFile() {
         // Arrange
-        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog.cfg");
+        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "samples", "_utlog.cfg");
             
         // Act
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
@@ -33,7 +35,7 @@ public class ConfigurationReaderTests {
     [Test]
     public void ReadFileWithFlags() {
         // Arrange
-        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog2.cfg");
+        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "samples", "_utlog2.cfg");
             
         // Act
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
@@ -58,7 +60,7 @@ public class ConfigurationReaderTests {
     [Test]
     public void ReadWithArguments() {
         // Arrange
-        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog3.cfg");
+        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "samples", "_utlog3.cfg");
             
         // Act
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
@@ -83,7 +85,7 @@ public class ConfigurationReaderTests {
     [Test]
     public void ReadWithCustomStream() {
         // Arrange
-        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog4.cfg");
+        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "samples", "_utlog4.cfg");
 
         // Act
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
@@ -105,7 +107,7 @@ public class ConfigurationReaderTests {
     [Test]
     public void ReadWithTypes() {
         // Arrange
-        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog5.cfg");
+        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "samples", "_utlog5.cfg");
 
         // Act
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
@@ -126,7 +128,7 @@ public class ConfigurationReaderTests {
     [Test]
     public void SetLogManagerConfiguration() {
         // Arrange
-        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog.cfg");
+        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "samples", "_utlog.cfg");
             
         // Act
         LogManager.Configuration =  ConfigurationReader.ReadFile(logCfgFn, false);
@@ -140,7 +142,7 @@ public class ConfigurationReaderTests {
     [Test]
     public void ApplyConfigurationFileTwice() {
         // Arrange
-        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "_utlog.cfg");
+        string logCfgFn = Path.Combine(TestContext.CurrentContext.TestDirectory, "samples", "_utlog.cfg");
         LogConfiguration lgCfg = ConfigurationReader.ReadFile(logCfgFn, false);
         LogManager.Configuration = lgCfg;
             
@@ -157,14 +159,16 @@ public class ConfigurationReaderTests {
         // Assert
     }
 
-    class HiddenStream : AbstractStream {
+    sealed class HiddenStream : AbstractStream {
 
+        /// <inheritdoc />
         protected override void OnDispose(bool disposing) {
-                
+            // Nothing to add here
         }
 
-        protected override void Write(string value) {
-                
+        /// <inheritdoc />
+        protected override void OnWrite(in ReadOnlySpan<char> value, in LogData logData) {
+            // Nothing to add here
         }
             
     }

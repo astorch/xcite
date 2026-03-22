@@ -13,5 +13,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\projects\xcite.logging\xcite.logging.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="samples\*.cfg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   
 </Project>
