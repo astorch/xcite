@@ -17,7 +17,7 @@ public class TextFormatter {
         { "text",   PlotText},
         { "nl",     PlotNewline},
         { "thread", PlotThread}
-    }.ToFrozenDictionary();
+    }.ToFrozenDictionary(StringComparer.InvariantCultureIgnoreCase);
     
     private readonly ConcurrentDictionary<string, IReadOnlyList<PlotPeer>> _plotSequences = new();
 
