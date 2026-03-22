@@ -27,4 +27,10 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.HighPerformance">
+      <Version>8.4.1</Version>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>
