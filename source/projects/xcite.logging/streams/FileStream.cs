@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace xcite.logging.streams;
 
@@ -152,6 +153,7 @@ public class FileStream : AbstractStream, FileStream._Bender {
     /// <summary> Defines a locking model aware file stream writer.
     /// </summary>
     protected abstract class AbstractStreamWriter : IDisposable {
+        private readonly Lock _writeLock = new();
         private bool _disposed;
         private System.IO.FileStream _fileStream;
 
@@ -204,9 +206,11 @@ public class FileStream : AbstractStream, FileStream._Bender {
 
         /// <summary> Writes the given <paramref name="data"/> to the underlying stream. </summary>
         public virtual void WriteToStream(in ReadOnlySpan<byte> data) {
-            _fileStream.Write(data);
-            // _fileStream.Flush(); // Do not immediately flush to reduce pressure to disk
-            LastWrite = DateTime.Now;
+            lock (_writeLock) {
+                _fileStream.Write(data);
+                // _fileStream.Flush(); // Do not immediately flush to reduce pressure to disk
+                LastWrite = DateTime.Now;
+            }
         }
 
         /// <summary>
