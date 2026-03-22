@@ -49,6 +49,7 @@ public class FileStream : AbstractStream, FileStream._Bender {
 
             int dataLength = dataBufferSpan.Length;
             ReadOnlySpan<byte> dataSpan = dataBufferSpan[..dataLength];
+            
             streamWriter.LockStream(dataLength);
             try {
                 streamWriter.WriteToStream(in dataSpan);
