@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using xcite.logging.streams;
 
@@ -122,8 +124,64 @@ public class LogTests {
         Assert.That(barStreamData, Is.EqualTo(expBarVal));
     }
 
+    [Test]
+    public void ParallelWithContext() {
+        // Arrange
+        const int maxWait = 100;
+        
+        StringBuilderLogStream sbls = new();
+        LogManager.Configuration
+            .AddStream(sbls)
+            .SetPattern("%level %tenantId::%caseId %name - %text%nl")
+            ;
+
+        async Task doSomeWorkAndLog(string tenantId, string caseId) {
+            ILog log = LogManager.GetLog("WORKER");
+            await Task.Delay(Random.Shared.Next(maxWait));
+            log.Info("Starting ...");
+            await using (LogContext.Add("tenantId", tenantId))
+            await using (LogContext.Add("caseId", caseId)) {
+                for (int i = -1; ++i != 5;) {
+                    await Task.Delay(Random.Shared.Next(maxWait));
+                    log.Info($"Running loop {i}");
+                    await Task.Delay(Random.Shared.Next(maxWait));
+                }
+                
+                log.Info("Finished loop");
+            }
+            log.Info("... Finished");
+        }
+        
+        // Act
+        int numTasks = 5;
+        string[] caseIds = Enumerable.Repeat(0, numTasks).Select(_ => Random.Shared.Next(10000).ToString("#####0")).ToArray();
+        Task[] tasks = new Task[numTasks];
+        for (int i = -1; ++i != numTasks;) {
+            string tenantId = i.ToString();
+            string caseId = caseIds[i];
+            tasks[i] = doSomeWorkAndLog(tenantId, caseId);
+        }
+
+        Task.WaitAll(tasks);
+
+        // Assert
+        string streamData = sbls.GetStreamData();
+        
+        string selTenantId = 0.ToString();
+        string selCaseId = caseIds[0];
+        Assert.That(streamData, Contains.Substring($"INFO  :: WORKER - Starting ...\n"));
+        Assert.That(streamData, Contains.Substring($"INFO  {selTenantId}::{selCaseId} WORKER - Running loop 0\n"));
+        Assert.That(streamData, Contains.Substring($"INFO  {selTenantId}::{selCaseId} WORKER - Running loop 1\n"));
+        Assert.That(streamData, Contains.Substring($"INFO  {selTenantId}::{selCaseId} WORKER - Running loop 2\n"));
+        Assert.That(streamData, Contains.Substring($"INFO  {selTenantId}::{selCaseId} WORKER - Running loop 3\n"));
+        Assert.That(streamData, Contains.Substring($"INFO  {selTenantId}::{selCaseId} WORKER - Running loop 4\n"));
+        Assert.That(streamData, Contains.Substring($"INFO  {selTenantId}::{selCaseId} WORKER - Finished loop\n"));
+        Assert.That(streamData, Contains.Substring($"INFO  :: WORKER - ... Finished\n"));
+    }
+
     private sealed class StringBuilderLogStream : AbstractStream {
         private readonly StringBuilder _stringBuilder = new(1000);
+        private readonly Lock _writeLock = new();
 
         /// <inheritdoc />
         protected override void OnDispose(bool disposing) {
@@ -131,17 +189,22 @@ public class LogTests {
         }
 
         protected override void OnWrite(in ReadOnlySpan<char> value, in LogData logData) {
-            _stringBuilder.Append(value);
+            lock (_writeLock) {
+                _stringBuilder.Append(value);
+            }
         }
 
         public string GetStreamData() {
-            return _stringBuilder.ToString();
+            lock (_writeLock) {
+                return _stringBuilder.ToString();
+            }
         }
         
     }
 
     private sealed class FilteredStream : AbstractStream {
         private readonly StringBuilder _stringBuilder = new(1000);
+        private readonly Lock _writeLock = new();
 
         /// <inheritdoc />
         protected override void OnDispose(bool disposing) {
@@ -149,13 +212,17 @@ public class LogTests {
         }
 
         protected override void OnWrite(in ReadOnlySpan<char> value, in LogData logData) {
-            _stringBuilder.Append(value);
+            lock (_writeLock) {
+                _stringBuilder.Append(value);
+            }
         }
 
         public string GetStreamData() {
-            return _stringBuilder.ToString();
+            lock (_writeLock) {
+                return _stringBuilder.ToString();
+            }
         }
-        
+
     }
     
 }
