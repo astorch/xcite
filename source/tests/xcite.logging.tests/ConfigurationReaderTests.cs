@@ -119,7 +119,7 @@ namespace xcite.logging.tests {
             ILogStream stream = lgCfg.Streams[0];
             
             Assert.IsTrue(stream is AbstractStream);
-            CollectionAssert.AreEqual(new[] { "foo", "bar" }, ((AbstractStream)stream).Types);
+            Assert.That(((AbstractStream)stream).Types, Is.EqualTo(["foo", "bar"]).AsCollection);
         }
 
         [Test]
