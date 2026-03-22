@@ -1,13 +1,14 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace xcite.logging;
 
 /// <summary> Provides methods to create instance of <see cref="ILog"/> and to manages the logging behavior. </summary>
 public static class LogManager {
-    private static readonly IDictionary<string, LogImpl> _logRepository = new Dictionary<string, LogImpl>(200);
-    private static readonly LogConfiguration _config = new LogConfiguration();
-    private static readonly LogOperator _logOperator = new LogOperator(_config, new TextFormatter(), new LogStreamManager());
+    private static readonly ConcurrentDictionary<string, Log> _logRepository = new();
+    private static readonly LogConfiguration _config = new();
+    private static readonly LogOperator _logOperator = new(_config, new TextFormatter(), new LogStreamManager());
 
     /// <summary> Log configuration </summary>
     public static LogConfiguration Configuration {
@@ -18,25 +19,20 @@ public static class LogManager {
     /// <summary> Creates an instance of <see cref="ILog"/> for the specified <paramref name="type"/>. </summary>
     /// <exception cref="ArgumentNullException">When <paramref name="type"/> is NULL.</exception>
     public static ILog GetLog(Type type) {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
         return GetLog(type.FullName);
     }
         
     /// <summary> Creates an instance of <see cref="ILog"/> for the specified <paramref name="name"/>. </summary>
     /// <exception cref="ArgumentNullException">When <paramref name="name"/> is NULL or empty.</exception>
     public static ILog GetLog(string name) {
-        if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
-
-        lock (_logRepository) {
-            if (_logRepository.TryGetValue(name, out LogImpl log)) return log;
-            _logRepository.Add(name, log = new LogImpl(name, _logOperator));
-            return log;
-        }
+        ArgumentException.ThrowIfNullOrEmpty(name);
+        return _logRepository.GetOrAdd(name, static nm => new Log(nm));
     }
 
     /// <summary> Applies the specified log <paramref name="config"/>. </summary>
     private static void SetConfiguration(LogConfiguration config) {
-        if (config == null) return;
+        if (config is null) return;
 
         _config.Reset()
             .SetLevel(config.Level)
@@ -49,79 +45,87 @@ public static class LogManager {
     }
         
     /// <summary> Anonymous implementation of <see cref="ILog"/>. </summary>
-    class LogImpl : ILog {
-        private readonly string _logName;
-        private readonly LogOperator _lgOp;
-
-        public LogImpl(string logName, LogOperator logOperator) {
-            _logName = logName;
-            _lgOp = logOperator;
-        }
+    [DebuggerDisplay("Log '{_logName}'")]
+    sealed class Log(string logName) : ILog {
+        private static readonly Exception _nullException = null;
+        private readonly string _logName = logName;
 
         /// <inheritdoc />
         public void Fatal(string value) {
-            _lgOp.Write(CreateLogData(ELogLevel.Fatal, value, null));
+            LogData logData = CreateLogData(in ELogLevel.Fatal, in value, in _nullException);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Fatal(string value, Exception exception) {
-            _lgOp.Write(CreateLogData(ELogLevel.Fatal, value, exception));
+            LogData logData = CreateLogData(in ELogLevel.Fatal, in value, in exception);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Error(string value) {
-            _lgOp.Write(CreateLogData(ELogLevel.Error, value, null));
+            LogData logData = CreateLogData(in ELogLevel.Error, in value, in _nullException);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Error(string value, Exception exception) {
-            _lgOp.Write(CreateLogData(ELogLevel.Error, value, exception));
+            LogData logData = CreateLogData(in ELogLevel.Error, in value, in exception);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Warning(string value) {
-            _lgOp.Write(CreateLogData(ELogLevel.Warn, value, null));
+            LogData logData = CreateLogData(in ELogLevel.Warn, in value, in _nullException);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Warning(string value, Exception exception) {
-            _lgOp.Write(CreateLogData(ELogLevel.Warn, value, exception));
+            LogData logData = CreateLogData(in ELogLevel.Warn, in value, in exception);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Info(string value) {
-            _lgOp.Write(CreateLogData(ELogLevel.Info, value, null));
+            LogData logData = CreateLogData(in ELogLevel.Info, in value, in _nullException);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Info(string value, Exception exception) {
-            _lgOp.Write(CreateLogData(ELogLevel.Info, value, exception));
+            LogData logData = CreateLogData(in ELogLevel.Info, in value, in exception);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Trace(string value) {
-            _lgOp.Write(CreateLogData(ELogLevel.Trace, value, null));
+            LogData logData = CreateLogData(in ELogLevel.Trace, in value, in _nullException);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Trace(string value, Exception exception) {
-            _lgOp.Write(CreateLogData(ELogLevel.Trace, value, exception));
+            LogData logData = CreateLogData(in ELogLevel.Trace, in value, in exception);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Debug(string value) {
-            _lgOp.Write(CreateLogData(ELogLevel.Debug, value, null));
+            LogData logData = CreateLogData(in ELogLevel.Debug, in value, in _nullException);
+            _logOperator.Write(in logData);
         }
 
         /// <inheritdoc />
         public void Debug(string value, Exception exception) {
-            _lgOp.Write(CreateLogData(ELogLevel.Debug, value, exception));
+            LogData logData = CreateLogData(in ELogLevel.Debug, in value, in exception);
+            _logOperator.Write(in logData);
         }
 
         /// <summary> Creates a new instance of <see cref="LogData"/> with the specified arguments. </summary>
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private LogData CreateLogData(ELogLevel logLevel, string value, Exception exception)
-            => new LogData {name = _logName, level = logLevel, value = value, exception = exception};
+        private LogData CreateLogData(in ELogLevel logLevel, in string value, in Exception exception)
+            => new(in _logName, in logLevel, in value, in exception);
 
     }
 }
