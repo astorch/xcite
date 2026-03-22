@@ -8,6 +8,7 @@ namespace xcite.logging.tests;
 
 [TestFixture]
 public class LogTests {
+    
     [OneTimeSetUp]
     public void OneTimeSetUp() {
         LogManager.Configuration.Reset();
@@ -16,7 +17,7 @@ public class LogTests {
     [Test]
     public void LogInfo() {
         // Arrange
-        StringBuilderLogStream sbls = new StringBuilderLogStream();
+        StringBuilderLogStream sbls = new();
         LogManager.Configuration.AddStream(sbls);
 
         // Act
@@ -26,16 +27,16 @@ public class LogTests {
         string tid = Thread.CurrentThread.ManagedThreadId.ToString();
 
         // Assert
-        string expVal = $"INFO {timestamp} [{tid}] LogTests - A simple log output.\r\n";
+        string expVal = $"INFO  {timestamp} [{tid}] LogTests - A simple log output.\n";
             
         string streamData = sbls.GetStreamData();
-        Assert.AreEqual(expVal, streamData);
+        Assert.That(streamData, Is.EqualTo(expVal));
     }
 
     [Test]
     public void LogErrorWithException() {
         // Arrange
-        StringBuilderLogStream sbls = new StringBuilderLogStream();
+        StringBuilderLogStream sbls = new();
         LogManager.Configuration.AddStream(sbls);
             
         // Act
@@ -46,17 +47,17 @@ public class LogTests {
             
         // Assert
         string streamData = sbls.GetStreamData();
-        string expLine1 = $"ERROR {timestamp} [{tid}] LogTests - Something went wrong.\r\n";
-        string expLine2 = $"ERROR {timestamp} [{tid}] LogTests - System.InvalidOperationException: This should not have happen.\r\n";
+        string expLine1 = $"ERROR {timestamp} [{tid}] LogTests - Something went wrong.\n";
+        string expLine2 = $"ERROR {timestamp} [{tid}] LogTests - System.InvalidOperationException: This should not have happen.\n";
             
-        Assert.IsTrue(streamData.Contains(expLine1));
-        Assert.IsTrue(streamData.Contains(expLine2));
+        Assert.That(streamData, Contains.Substring(expLine1));
+        Assert.That(streamData, Contains.Substring(expLine2));
     }
 
     [Test]
     public void DoNotLogDebugOnInfoLevel() {
         // Arrange
-        StringBuilderLogStream sbls = new StringBuilderLogStream();
+        StringBuilderLogStream sbls = new();
         LogManager.Configuration
             .AddStream(sbls)
             .SetLevel(ELogLevel.Info);
@@ -67,13 +68,13 @@ public class LogTests {
             
         // Assert
         string streamData = sbls.GetStreamData();
-        Assert.IsEmpty(streamData);
+        Assert.That(streamData, Is.Empty);
     }
 
     [Test]
     public void DoLogTraceOnDebugLevel() {
         // Arrange
-        StringBuilderLogStream sbls = new StringBuilderLogStream();
+        StringBuilderLogStream sbls = new();
         LogManager.Configuration
             .AddStream(sbls)
             .SetLevel(ELogLevel.Debug);
@@ -85,19 +86,19 @@ public class LogTests {
         string tid = Thread.CurrentThread.ManagedThreadId.ToString();
 
         // Assert
-        string expVal = $"TRACE {timestamp} [{tid}] LogTests - A trace record.\r\n";
+        string expVal = $"TRACE {timestamp} [{tid}] LogTests - A trace record.\n";
         string streamData = sbls.GetStreamData();
-        Assert.AreEqual(expVal, streamData);
+        Assert.That(streamData, Is.EqualTo(expVal));
     }
 
     [Test]
     public void DoNotLogIfWrongType() {
         // Arrange
-        FilteredStream fooStream = new FilteredStream {
-            Types = new[] { "FooType" }
+        FilteredStream fooStream = new() {
+            Types = ["FooType"]
         };
-        FilteredStream barStream = new FilteredStream {
-            Types = new[] { "BarType" }
+        FilteredStream barStream = new() {
+            Types = ["BarType"]
         };
         LogManager.Configuration
             .AddStream(fooStream)
@@ -113,45 +114,48 @@ public class LogTests {
         string tid = Thread.CurrentThread.ManagedThreadId.ToString();
 
         // Assert
-        string expFooVal = $"TRACE {timestamp} [{tid}] FooType - foo\r\n";
-        string expBarVal = $"TRACE {timestamp} [{tid}] BarType - bar\r\n";
+        string expFooVal = $"TRACE {timestamp} [{tid}] FooType - foo\n";
+        string expBarVal = $"TRACE {timestamp} [{tid}] BarType - bar\n";
         string fooStreamData = fooStream.GetStreamData();
         string barStreamData = barStream.GetStreamData();
-        Assert.AreEqual(expFooVal, fooStreamData);
-        Assert.AreEqual(expBarVal, barStreamData);
+        Assert.That(fooStreamData, Is.EqualTo(expFooVal));
+        Assert.That(barStreamData, Is.EqualTo(expBarVal));
     }
 
-    private class StringBuilderLogStream : AbstractStream {
-        private readonly StringBuilder _stringBuilder = new StringBuilder(1000);
+    private sealed class StringBuilderLogStream : AbstractStream {
+        private readonly StringBuilder _stringBuilder = new(1000);
 
         /// <inheritdoc />
         protected override void OnDispose(bool disposing) {
             // Nothing to do here
         }
 
-        protected override void Write(string value) {
+        protected override void OnWrite(in ReadOnlySpan<char> value, in LogData logData) {
             _stringBuilder.Append(value);
         }
 
         public string GetStreamData() {
             return _stringBuilder.ToString();
         }
+        
     }
 
-    private class FilteredStream : AbstractStream {
-        private readonly StringBuilder _stringBuilder = new StringBuilder(1000);
+    private sealed class FilteredStream : AbstractStream {
+        private readonly StringBuilder _stringBuilder = new(1000);
 
         /// <inheritdoc />
         protected override void OnDispose(bool disposing) {
             // Nothing to do here
         }
 
-        protected override void Write(string value) {
+        protected override void OnWrite(in ReadOnlySpan<char> value, in LogData logData) {
             _stringBuilder.Append(value);
         }
 
         public string GetStreamData() {
             return _stringBuilder.ToString();
         }
+        
     }
+    
 }
