@@ -8,15 +8,17 @@ namespace xcite.logging.tests;
 
 [TestFixture]
 public class FileStreamTests {
+    
     [Test]
     public void Write() {
         // Arrange
         string logFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "_log.txt");
-        if (File.Exists(logFilePath))
+        if (File.Exists(logFilePath)) {
             File.Delete(logFilePath);
+        }
 
         string logText = "INFO 30.12.2018 19:44:51 FileStreamTests - Something about logging.\r\n";
-        FileStream fileStream = new FileStream {FileName = logFilePath};
+        FileStream fileStream = new() { FileName = logFilePath };
 
         // Act
         using (fileStream) {
@@ -32,13 +34,14 @@ public class FileStreamTests {
     public void WriteDailyRolling() {
         // Arrange
         string[] files = Directory.GetFiles(TestContext.CurrentContext.TestDirectory, "*.txt");
-        for (int i = -1; ++i != files.Length;)
+        for (int i = -1; ++i != files.Length;) {
             File.Delete(files[i]);
+        }
             
         string logFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "_log.txt");
         string logTextYesterday = "INFO 30.12.2018 19:44:51 FileStreamTests - Say hi from yesterday.\r\n";
         string logTextToday = "INFO 31.12.2018 19:44:51 FileStreamTests - Say hi from today.\r\n";
-        FileStream fileStream = new FileStream {FileName = logFilePath, DailyRolling = true};
+        FileStream fileStream = new() { FileName = logFilePath, DailyRolling = true };
         DateTime today = DateTime.Today;
         DateTime yesterday = today.AddDays(-1);
 
@@ -73,14 +76,14 @@ public class FileStreamTests {
         // Arrange
         string recordText = "Some record";
         string logFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "logs", "_log.txt");
-        FileInfo fileNfo = new FileInfo(logFilePath);
+        FileInfo fileNfo = new(logFilePath);
         if (fileNfo.Exists) {
             DirectoryInfo fileFolder = fileNfo.Directory;
             fileNfo.Delete();
             fileFolder?.Delete(true);
         }
 
-        FileStream fileStream = new FileStream {FileName = logFilePath};
+        FileStream fileStream = new() { FileName = logFilePath };
             
         // Act
         using (fileStream) {
@@ -101,13 +104,14 @@ public class FileStreamTests {
         string baseText = "This is the first line\n";
         string recordText = "This is the recorded line.";
         string logFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "fileToAppend.txt");
-        if (File.Exists(logFile))
+        if (File.Exists(logFile)) {
             File.Delete(logFile);
+        }
            
         File.WriteAllText(logFile, baseText);
 
         // Act
-        FileStream fileStream = new FileStream {FileName = logFile, Append = true};
+        FileStream fileStream = new() { FileName = logFile, Append = true };
         using (fileStream) {
             fileStream.Write(recordText, new LogData());
         }
@@ -135,7 +139,7 @@ public class FileStreamTests {
         File.WriteAllText(logFile, baseText);
 
         // Act
-        FileStream fileStream = new FileStream {FileName = logFile, Append = false};
+        FileStream fileStream = new() { FileName = logFile, Append = false };
         using (fileStream) {
             fileStream.Write(recordText, new LogData());
         }
@@ -154,11 +158,12 @@ public class FileStreamTests {
         string baseText = "This is the first line\n";
         string recordText = "This is the recorded line.";
         string logFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "fileToAppend.txt");
-        if (File.Exists(logFile))
+        if (File.Exists(logFile)) {
             File.Delete(logFile);
+        }
             
         // Act
-        FileStream fileStream = new FileStream {FileName = logFile, Append = true, LockingModel = ELockingModel.Minimal};
+        FileStream fileStream = new() { FileName = logFile, Append = true, LockingModel = ELockingModel.Minimal };
         using (fileStream) {
             fileStream.Write(baseText, new LogData());
             fileStream.Write(recordText, new LogData());
@@ -177,4 +182,5 @@ public class FileStreamTests {
             
         Assert.AreEqual(expectedText, logFileText);
     }
+    
 }
