@@ -52,12 +52,12 @@ public static class ConfigurationReader {
     /// is returned. 
     /// </summary>
     public static LogConfiguration ReadText(string fileContent) {
-        LogConfiguration fileConfig = new LogConfiguration();
+        LogConfiguration fileConfig = new();
 
         // No content, no configuration
         if (string.IsNullOrEmpty(fileContent)) return fileConfig;
 
-        Dictionary<string, ILogStream> streamSet = new Dictionary<string, ILogStream>(10);
+        Dictionary<string, ILogStream> streamSet = new(10);
             
         // Parse lines
         string[] lines = fileContent.Split('\n');
@@ -69,7 +69,7 @@ public static class ConfigurationReader {
             string[] linePair = line.Split('=');
             if (linePair.Length != 2) continue; // Invalid format
 
-            char[] bias = {' ', '\t', '\r'};
+            char[] bias = [' ', '\t', '\r'];
             string key = linePair[0].Trim(bias).ToLower();
             string value = linePair[1].Trim(bias);
                 
@@ -112,8 +112,8 @@ public static class ConfigurationReader {
                 continue;
             }
 
-            streamId = key.Substring(0, psIdx);
-            streamProp = key.Substring(psIdx + 1);
+            streamId = key[..psIdx];
+            streamProp = key[(psIdx + 1)..];
             if (!streamSet.TryGetValue(streamId, out logStream)) continue;
             SetStreamProperty(logStream, streamProp, value);
         }
@@ -127,11 +127,11 @@ public static class ConfigurationReader {
     /// not own the declared <paramref name="property"/>, nothing will happen.
     /// </summary>
     private static void SetStreamProperty(ILogStream logStream, string property, string value) {
-        if (logStream == null) return;
+        if (logStream is null) return;
 
         string lcProp = property.ToLower();
         PropertyInfo[] logStreamProperties = logStream.GetType().GetProperties();
-        for (int i = -1; ++i != logStreamProperties.Length;) {
+        for (int i = -1, ilen = logStreamProperties.Length; ++i != ilen;) {
             PropertyInfo logStreamProperty = logStreamProperties[i];
             string lcStreamProp = logStreamProperty.Name.ToLower();
             if (lcStreamProp != lcProp) continue;
@@ -142,13 +142,14 @@ public static class ConfigurationReader {
             if (propertyType.IsEnum) {
                 val = Enum.Parse(propertyType, value, true);
             } else if (propertyType.IsArray && propertyType.GetElementType() == typeof(string)) {
-                string[] types = value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                string[] types = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 for (int j = -1, jlen = types.Length; ++j != jlen; )
-                    types[j] = types[j].Trim();
+                    types[j] = types[j];
                     
                 val = types;
-            } else
+            } else {
                 val = Convert.ChangeType(value, propertyType);
+            }
                 
             logStreamProperty.SetValue(logStream, val);
             return;
