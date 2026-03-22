@@ -133,5 +133,51 @@ public class TextFormatterTests {
         Assert.That(value1, Is.EqualTo($"TRACE {timestamp} [{threadId}] Almoner - This is a message\n"));
         Assert.That(value2, Is.EqualTo(value1));
     }
+
+    [Test]
+    public void LogContext() {
+        // Arrange
+        string pattern = "%level %tenantId::%caseId %name - %text%nl";
+        LogData logData = new(
+            name: "xcite.logging.tests.Almoner",
+            level: ELogLevel.Trace,
+            value: "This is a message",
+            exception:null
+        );
+        
+        // Act
+        TextFormatter textFormatter = new();
+        ArrayPoolBufferWriter<char> bufferWriter = new();
+        
+        textFormatter.FormatValue(pattern, logData, bufferWriter);
+        string value1 = new(bufferWriter.WrittenSpan);
+
+        bufferWriter.Clear();
+        ILogContextProperty p1 = logging.LogContext.Add("tenantId", "a41f");
+        textFormatter.FormatValue(pattern, logData, bufferWriter);
+        string value2 = new(bufferWriter.WrittenSpan);
+        
+        bufferWriter.Clear();
+        ILogContextProperty p2 = logging.LogContext.Add("caseId", 10227.ToString("#####0"));
+        textFormatter.FormatValue(pattern, logData, bufferWriter);
+        string value3 = new(bufferWriter.WrittenSpan);
+        
+        bufferWriter.Clear();
+        p1.Dispose();
+        textFormatter.FormatValue(pattern, logData, bufferWriter);
+        string value4 = new(bufferWriter.WrittenSpan);
+        
+        bufferWriter.Clear();
+        p2.Dispose();
+        textFormatter.FormatValue(pattern, logData, bufferWriter);
+        string value5 = new(bufferWriter.WrittenSpan);
+        
+        // Assert
+        Assert.That(value1, Is.EqualTo("TRACE :: Almoner - This is a message\n"));
+        Assert.That(value2, Is.EqualTo("TRACE a41f:: Almoner - This is a message\n"));
+        Assert.That(value3, Is.EqualTo("TRACE a41f::10227 Almoner - This is a message\n"));
+        Assert.That(value4, Is.EqualTo("TRACE ::10227 Almoner - This is a message\n"));
+        Assert.That(value5, Is.EqualTo("TRACE :: Almoner - This is a message\n"));
+    }
     
 }

@@ -101,7 +101,7 @@ public class TextFormatter {
     /// is returned.
     /// </summary>
     private static PlotPeer GetPlotPeer(string plotName, string plotArg) {
-        Plot basePlot = _standardPlotter.TryGetValue(plotName, out Plot plot) ? plot : PlotNull;
+        Plot basePlot = _standardPlotter.TryGetValue(plotName, out Plot plot) ? plot : (in _, in logData, in bufferWriter) => PlotWithContext(in plotName, in plotArg, in logData, in bufferWriter);
         return (in logData, in bufferWriter) => basePlot(in plotArg, in logData, in bufferWriter);
     }
 
@@ -147,11 +147,17 @@ public class TextFormatter {
     
     private delegate void PlotPeer(in LogData logData, in IBufferWriter<char> bufferWriter);
     
-    private delegate void Plot(in string arg, in LogData logData, in IBufferWriter<char> bufferWriter);
+    private delegate void Plot(in string plotArg, in LogData logData, in IBufferWriter<char> bufferWriter);
     
     /// <summary> Plots nothing. </summary>
     private static void PlotNull(in string arg, in LogData logData, in IBufferWriter<char> bufferWriter) {
         // Do nothing
+    }
+
+    /// <summary> Plots that property from the log context or nothing. </summary>
+    private static void PlotWithContext(in string propertyName, in string arg, in LogData logData, in IBufferWriter<char> bufferWriter) {
+        if (!LogContext.TryGetValue(propertyName, out string propertyValue)) return;
+        bufferWriter.Write(propertyValue);
     }
 
     /// <summary> Plots the thread information based on the specified <paramref name="arg"/>. </summary>
