@@ -6,28 +6,28 @@ namespace xcite.logging;
 public class ELogLevel {
     
     /// <summary> Flag to set that no message is logged. </summary>
-    public static readonly ELogLevel None  = new ELogLevel("NONE", -1);
+    public static readonly ELogLevel None  = new("NONE ", -1);
         
     /// <summary> Flag to set that only messages with fatal severity are logged. </summary>
-    public static readonly ELogLevel Fatal = new ELogLevel("FATAL", 0);
+    public static readonly ELogLevel Fatal = new("FATAL", 0);
         
     /// <summary> Flag to set that only messages with error severity are logged. </summary>
-    public static readonly ELogLevel Error = new ELogLevel("ERROR", 0);
+    public static readonly ELogLevel Error = new("ERROR", 0);
         
     /// <summary> Flag to set that only messages with warning severity are logged. </summary>
-    public static readonly ELogLevel Warn  = new ELogLevel("WARN", 0);
+    public static readonly ELogLevel Warn  = new("WARN ", 0);
         
     /// <summary> Flag to set that only messages with info severity are logged. </summary>
-    public static readonly ELogLevel Info  = new ELogLevel("INFO", 4);
+    public static readonly ELogLevel Info  = new("INFO ", 4);
         
     /// <summary> Flag to set that only messages with trace severity are logged. </summary>
-    public static readonly ELogLevel Trace = new ELogLevel("TRACE", 5);
+    public static readonly ELogLevel Trace = new("TRACE", 5);
         
     /// <summary> Flag to set that only messages with debug severity are logged. </summary>
-    public static readonly ELogLevel Debug = new ELogLevel("DEBUG", 6);
+    public static readonly ELogLevel Debug = new("DEBUG", 6);
 
     /// <summary> Set of defined enum values. </summary>
-    public static readonly ELogLevel[] Values  = {None, Fatal, Error, Warn, Info, Trace, Debug};
+    public static readonly ELogLevel[] Values  = [None, Fatal, Error, Warn, Info, Trace, Debug];
         
     private readonly string _name;
     private readonly int _severity;
@@ -39,17 +39,15 @@ public class ELogLevel {
     }
 
     /// <inheritdoc />
-    public override string ToString() {
-        return _name;
-    }
+    public override string ToString()
+        => _name;
 
     /// <summary>
     /// Returns TRUE if the given <paramref name="level"/> is greater or equal
     /// as the current.
     /// </summary>
-    public bool IsGreaterOrEqual(ELogLevel level) {
-        return level._severity >= _severity;
-    }
+    public bool IsGreaterOrEqual(ELogLevel level)
+        => level._severity >= _severity;
 
     /// <summary>
     /// Parses the given <paramref name="value"/> and returns the corresponding
