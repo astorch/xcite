@@ -1,159 +1,214 @@
 using System;
+using System.Buffers;
+using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 
 namespace xcite.logging;
 
 /// <summary> Formats log records based on a specified pattern. </summary>
 public class TextFormatter {
-    private readonly Dictionary<string, Plot> _plotter = new Dictionary<string, Plot>(10) {
-        {"level", PlotLogLevel},
-        {"date", PlotDate},
-        {"name", PlotLogName},
-        {"text", PlotText},
-        {"nl", PlotNewline},
-        {"thread", PlotThread}
-    };
+
+    private readonly FrozenDictionary<string, Plot> _standardPlotter;
+    private readonly ConcurrentDictionary<string, IReadOnlyList<PlotPeer>> _plotSequences = new();
+    private readonly Encoding _encoding = new UTF8Encoding(false);
+
+    /// <summary> Initializes the new instance </summary>
+    public TextFormatter() {
+        _standardPlotter = new Dictionary<string, Plot>(6) {
+            { "level",  PlotLogLevel},
+            { "date",   PlotDate},
+            { "name",   PlotLogName},
+            { "text",   PlotText},
+            { "nl",     PlotNewline},
+            { "thread", PlotThread}
+        }.ToFrozenDictionary();
+    }
 
     /// <summary> Formats the given <paramref name="logData"/> using the specified <paramref name="pattern"/>. </summary>
-    public string FormatValue(string pattern, LogData logData) {
-        if (string.IsNullOrEmpty(pattern)) return string.Empty;
-            
-        char[] patternChars = pattern.ToCharArray();
-        char[] buffer = new char[500];
+    public void FormatValue(in string pattern, in LogData logData, in IBufferWriter<byte> bufferWriter) {
+        foreach (PlotPeer plotPeer in ToPlotPeerSequence(in pattern)) {
+            plotPeer(in logData, in bufferWriter);
+        }
+    }
+    
+    /// <summary> Returns a sequence of plot peers for that <paramref name="pattern"/>. </summary>
+    private IReadOnlyList<PlotPeer> ToPlotPeerSequence(in string pattern)
+        => _plotSequences.GetOrAdd(
+            pattern,
+            pttrn => BuildPlotSequence(in pttrn) 
+        );
+
+    /// <summary> Builds a sequence of plot peers for that <paramref name="pattern"/>. </summary>
+    private IReadOnlyList<PlotPeer> BuildPlotSequence(in string pattern) {
+        if (string.IsNullOrWhiteSpace(pattern)) return [];
+
+        List<PlotPeer> plotSequence = new(16);
+        
+        // "%level %date(dd.MM.yyyy HH:mm:ss) [%thread] %name - %text%nl"
+
+        Span<char> buffer = stackalloc char[64];
         int p = 0;
+
+        Span<char> plotNameBuffer = stackalloc char[64];
+        Span<char> plotArgBuffer = stackalloc char[256];
+        
+        ReadOnlySpan<char> patternChars = pattern.AsSpan();
         for (int i = -1; ++i != patternChars.Length;) {
             char c = patternChars[i];
 
             if (c == '%') {
-                string token = ReadTokenName(patternChars, i, out string arg, out int end);
-                Plot plot = GetPlotter(token);
-                string tokenValue = plot(arg, logData);
 
-                if (p + tokenValue.Length >= buffer.Length)
-                    Array.Resize(ref buffer, (int) (p + tokenValue.Length * 1.4));
+                if (p != 0) {
+                    string fillData = new(buffer);
+                    PlotPeer plotFill = (in _, in writer) => _encoding.GetBytes(fillData, writer);
+                    plotSequence.Add(plotFill);
                     
-                for (int j = -1; ++j != tokenValue.Length;)
-                    buffer[p++] = tokenValue[j];
-
-                i = end;
+                    buffer.Clear();
+                    p = 0;
+                }
+                
+                plotNameBuffer.Clear();
+                plotArgBuffer.Clear();
+                
+                ReadPlotSegment(in patternChars, ref i, in plotNameBuffer, plotArgBuffer);
+                
+                plotSequence.Add(GetPlotPeer(new string(plotNameBuffer), new string(plotArgBuffer)));
                 continue;
             }
-
-            if (p == buffer.Length)
-                Array.Resize(ref buffer, (int) (buffer.Length * 1.4));
 
             buffer[p++] = c;
         }
 
-        return new string(buffer, 0, p);
+        if (p != 0) {
+            string fillData = new(buffer);
+            PlotPeer plotFill = (in _, in writer) => _encoding.GetBytes(fillData, writer);
+            plotSequence.Add(plotFill);
+                    
+            // No clean-up here
+        }
+
+        return plotSequence;
     }
 
     /// <summary>
-    /// Returns the plotter that is related with the specified <paramref name="tokenName"/>.
+    /// Returns the plotter that is related with the specified <paramref name="plotName"/>.
     /// If there isn't a registered plotter, a default plotter that writes an empty string
     /// is returned.
     /// </summary>
-    private Plot GetPlotter(string tokenName) {
-        if (_plotter.TryGetValue(tokenName, out Plot plot)) return plot;
-        return (s, data) => string.Empty;
+    private PlotPeer GetPlotPeer(string plotName, string plotArg) {
+        Plot basePlot = _standardPlotter.TryGetValue(plotName, out Plot plot) ? plot : PlotNull;
+        return (in logData, in bufferWriter) => basePlot(in plotArg, in logData, in bufferWriter);
     }
-        
+
     /// <summary>
-    /// Parses the plot token name from the given <paramref name="patternCharSet"/> beginning
-    /// at the specified index <paramref name="b"/>. If the token name is followed by an argument,
-    /// the argument value is provided via <paramref name="arg"/>. The token name end index is provided
-    /// via <paramref name="e"/>.
+    /// Parses the plot segment name from the given <paramref name="patternChars"/> beginning
+    /// at the specified index <paramref name="i"/>. If the segment name is followed by an argument,
+    /// the argument value is provided via <paramref name="plotArgBuffer"/>.
     /// </summary>
-    private static string ReadTokenName(char[] patternCharSet, int b, out string arg, out int e) {
-        char[] buffer = new char[50];
-        int p = 0;
-
-        char[] argCharSet = new char[50];
-        int l = 0;
-
+    private static void ReadPlotSegment(
+        in ReadOnlySpan<char> patternChars, ref int i, 
+        in Span<char> plotNameBuffer, in Span<char> plotArgBuffer
+    ) {
         bool argMode = false;
+
+        int p1 = 0;
+        int p2 = 0;
+        for (int ilen = patternChars.Length; ++i != ilen;) {
+            char c = patternChars[i];
+
+            switch (c) {
+                case '(':
+                    argMode = true;
+                    continue;
+                case ')':
+                    argMode = false;
+                    continue;
+            }
             
-        e = b;
-        for (; ++e != patternCharSet.Length;) {
-            char c = patternCharSet[e];
-
-            if (c == '(') {
-                argMode = true;
-                continue;
-            }
-
-            if (c == ')') {
-                argMode = false;
-                continue;
-            }
-                
-            if (!argMode && (c == ' ' || c == '%' || !char.IsLetter(c))) {
+            if (!argMode && (c is ' ' or '%' || !char.IsLetter(c))) {
                 break;
             }
 
-            if (argMode)
-                argCharSet[l++] = c;
-            else
-                buffer[p++] = c;
-        }
-
-        e--;
+            switch (argMode) {
+                case true:
+                    plotArgBuffer[p2++] = c; 
+                    continue;
+                case false:
+                    plotNameBuffer[p1++] = c;
+                    continue;
+            }
             
-        arg = new string(argCharSet, 0, l);
-        return new string(buffer, 0, p);
+        }
     }
 
-    /// <summary> Signature of a data plotter. </summary>
-    /// <param name="arg">(Optional) Plot argument</param>
-    /// <param name="logData">Data to plot</param>
-    private delegate string Plot(string arg, LogData logData);
+    
+    private delegate void PlotPeer(in LogData logData, in IBufferWriter<byte> bufferWriter);
+    
+    private delegate void Plot(in string arg, in LogData logData, in IBufferWriter<byte> bufferWriter);
+    
+    /// <summary> Plots nothing. </summary>
+    private static void PlotNull(in string arg, in LogData logData, in IBufferWriter<byte> bufferWriter) {
+        // Do nothing
+    }
 
     /// <summary> Plots the thread information based on the specified <paramref name="arg"/>. </summary>
-    private static string PlotThread(string arg, LogData logData) {
-        Thread td = Thread.CurrentThread;
-        if (arg == null) return td.ManagedThreadId.ToString();
-        if (arg == "name") return td.Name;
-        return td.ManagedThreadId.ToString();
-    }
-        
-    /// <summary> Plots a newline string. </summary>
-    private static string PlotNewline(string _, LogData logData) {
-        return Environment.NewLine;
-    }
-        
-    /// <summary> Plots the log data value. </summary>
-    private static string PlotText(string _, LogData logData) {
-        return logData.value;
+    private void PlotThread(in string arg, in LogData logData, in IBufferWriter<byte> bufferWriter) {
+        Thread thread = Thread.CurrentThread;
+        string txt = arg switch {
+            null => thread.ManagedThreadId.ToString(),
+            "name" => thread.Name,
+            _ => thread.ManagedThreadId.ToString()
+        };
+
+        _encoding.GetBytes(txt, bufferWriter);
     }
 
+    /// <summary> Plots a newline string. </summary>
+    private static void PlotNewline(in string _, in LogData logData, in IBufferWriter<byte> bufferWriter)
+        => bufferWriter.Write("\n"u8);
+
+    /// <summary> Plots the log data value. </summary>
+    private void PlotText(in string _, in LogData logData, in IBufferWriter<byte> bufferWriter)
+        => _encoding.GetBytes(logData.value, bufferWriter);
+
     /// <summary> Plots the name of the log based on the specified <paramref name="format"/>. </summary>
-    private static string PlotLogName(string format, LogData logData) {
+    private void PlotLogName(in string format, in LogData logData, in IBufferWriter<byte> bufferWriter) {
         string logName = logData.name;
         int dotTkIdx = logName.LastIndexOf('.');
             
         // No qualified class name
-        if (dotTkIdx == -1) return logName;
+        if (dotTkIdx == -1) {
+            _encoding.GetBytes(logName, bufferWriter);
+            return;
+        }
 
-        string simpleName = logName.Substring(dotTkIdx + 1);
+        string simpleName = logName[(dotTkIdx + 1)..];
             
         // No format specified, so we take the simple name as default
-        if (string.IsNullOrEmpty(format)) return simpleName;
+        if (string.IsNullOrEmpty(format)) {
+            _encoding.GetBytes(simpleName, bufferWriter);
+            return;
+        }
 
         // Explicitly full qualified requested
-        if (format == "fq") return logName;
+        if (format == "fq") {
+            _encoding.GetBytes(logName, bufferWriter);
+            return;
+        }
 
         // Any other cases
-        return simpleName;
+        _encoding.GetBytes(simpleName, bufferWriter);
     }
 
     /// <summary> Plots the current log level. </summary>
-    private static string PlotLogLevel(string arg, LogData data) {
-        return data.level.ToString();
-    }
+    private void PlotLogLevel(in string arg, in LogData data, in IBufferWriter<byte> bufferWriter)
+        => _encoding.GetBytes(data.level.ToString(), bufferWriter);
 
     /// <summary> Plots the current timestamp with the specified <paramref name="format"/>. </summary>
-    private static string PlotDate(string format, LogData _) {
-        return DateTime.Now.ToString(format);
-    }
+    private void PlotDate(in string format, in LogData _, in IBufferWriter<byte> bufferWriter)
+        => _encoding.GetBytes(DateTime.Now.ToString(format), bufferWriter);
+    
 }
